@@ -1,0 +1,4 @@
+/.idea/
+.env
+backend/linkami.db
+package-lock.json

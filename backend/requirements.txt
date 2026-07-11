@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+bcrypt
+metadata_parser
+requests
+beautifulsoup4
+PyJWT
