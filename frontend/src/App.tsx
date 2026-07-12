@@ -7,6 +7,21 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 export default function App() {
   return (
     <BrowserRouter>
+      <style>{`
+        .custom-tag-checkbox {
+          appearance: none;
+          background-color: #fff;
+          border: 1px solid #000;
+        }
+        .custom-tag-checkbox:checked {
+          background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='black' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+          background-size: 100% 100%;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-color: #fff;
+          border-color: #000;
+        }
+      `}</style>
       <Routes>
         <Route path="/" element={<AuthScreen />} />
         <Route path="/:collectionName" element={<DashboardWrapper />} />
@@ -476,7 +491,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
                       {link.tags && (
                         <div className="flex flex-wrap gap-2 mt-2">
                           {link.tags.split(',').map((tag: string, i: number) => tag.trim() ? (
-                            <span key={i} className="bg-gray-50 text-gray-600 px-2 py-1 rounded text-xs">
+                            <span key={i} onClick={(e) => { e.preventDefault(); onTagClick(tag.trim()); }} className={`cursor-pointer px-2 py-1 rounded text-xs ${tagsParam.split(',').includes(tag.trim()) ? 'bg-blue-100 text-blue-700' : 'bg-gray-50 text-gray-600 hover:bg-gray-200'}`}>
                               {tag.trim()}
                             </span>
                           ) : null)}
@@ -512,7 +527,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
                       {link.tags && (
                         <div className="flex flex-wrap gap-2 mt-2">
                           {link.tags.split(',').map((tag: string, i: number) => tag.trim() ? (
-                            <span key={i} className="bg-gray-50 text-gray-600 px-2 py-1 rounded text-xs">
+                            <span key={i} onClick={(e) => { e.preventDefault(); onTagClick(tag.trim()); }} className={`cursor-pointer px-2 py-1 rounded text-xs ${tagsParam.split(',').includes(tag.trim()) ? 'bg-blue-100 text-blue-700' : 'bg-gray-50 text-gray-600 hover:bg-gray-200'}`}>
                               {tag.trim()}
                             </span>
                           ) : null)}
@@ -770,18 +785,46 @@ function EditScreen() {
   const { collectionName, linkId } = useParams()
   const navigate = useNavigate()
   const [link, setLink] = useState<any>(null)
+  const [allTags, setAllTags] = useState<string[]>([])
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
+  const [newTagsString, setNewTagsString] = useState<string>('')
   
   useEffect(() => {
-    const fetchLink = async () => {
+    const fetchLinkAndTags = async () => {
       const token = localStorage.getItem('linkami_token')
-      const res = await fetch(`${API_URL}/link/${linkId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      if (res.ok) setLink(await res.json())
-      else navigate(`/${collectionName}`)
+      const headers = { 'Authorization': `Bearer ${token}` }
+      
+      const [linkRes, tagsRes] = await Promise.all([
+        fetch(`${API_URL}/link/${linkId}`, { headers }),
+        fetch(`${API_URL}/collection/${collectionName}/tags`, { headers })
+      ])
+      
+      if (linkRes.ok) {
+        const linkData = await linkRes.json()
+        setLink(linkData)
+        if (linkData.tags) {
+           setSelectedTags(new Set(linkData.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t)))
+        }
+      } else {
+        navigate(`/${collectionName}`)
+      }
+      
+      if (tagsRes.ok) {
+        setAllTags(await tagsRes.json())
+      }
     }
-    fetchLink()
+    fetchLinkAndTags()
   }, [linkId, collectionName, navigate])
+
+  const handleTagToggle = (tag: string) => {
+    const newSelected = new Set(selectedTags)
+    if (newSelected.has(tag)) {
+      newSelected.delete(tag)
+    } else {
+      newSelected.add(tag)
+    }
+    setSelectedTags(newSelected)
+  }
 
   const handleSave = async (e: any) => {
     e.preventDefault()
@@ -794,7 +837,7 @@ function EditScreen() {
         title: link.title,
         description: link.description,
         image: link.image,
-        tags: link.tags
+        tags: Array.from(selectedTags).join(',') + (newTagsString ? ',' + newTagsString : '')
       })
     })
     navigate(`/${collectionName}`)
@@ -849,11 +892,30 @@ function EditScreen() {
                     <input 
                       type="text"
                       className="w-full p-3 appearance-none block text-gray-700 border text-md border-gray-200 rounded px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
-                      value={link.tags || ''}
-                      onChange={e => setLink({...link, tags: e.target.value})}
+                      value={newTagsString}
+                      onChange={e => setNewTagsString(e.target.value)}
                       placeholder="comma separate tags to assign multiple at once"
                     />
                   </div>
+                  
+                  {allTags.length > 0 && (
+                    <div className="my-4">
+                      <label className="my-2 block text-sm font-medium leading-5 text-gray-700">Use existing tags</label>
+                      <div className="flex flex-col gap-3 mt-2">
+                        {allTags.map(tag => (
+                          <label key={tag} className="flex items-center space-x-2">
+                            <input 
+                              type="checkbox"
+                              checked={selectedTags.has(tag)}
+                              onChange={() => handleTagToggle(tag)}
+                              className="custom-tag-checkbox h-4 w-4 rounded cursor-pointer"
+                            />
+                            <span className="text-sm text-gray-700">{tag}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </fieldset>
               </div>
             </div>

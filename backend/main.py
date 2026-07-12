@@ -331,6 +331,27 @@ def get_collection_info(name: str, db: Session = Depends(get_db), credentials: H
         "is_owner": is_owner
     }
 
+@app.get("/api/collection/{name}/tags", response_model=List[str], tags=["Collections"])
+def get_collection_tags(name: str, db: Session = Depends(get_db), credentials: HTTPAuthorizationCredentials = Depends(security)):
+    col = db.query(Collection).filter(Collection.name == name).first()
+    if not col:
+        raise HTTPException(status_code=404, detail="Collection not found")
+
+    is_owner = False
+    if credentials:
+        try:
+            payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=["HS256"])
+            if str(payload.get("sub")) == str(col.id):
+                is_owner = True
+        except:
+            pass
+
+    if not col.is_public and not is_owner:
+        raise HTTPException(status_code=403, detail="Private collection")
+        
+    tags = db.query(Tag.name).join(Link).filter(Link.collection_id == col.id).distinct().order_by(Tag.name.asc()).all()
+    return [t[0] for t in tags]
+
 @app.get("/api/settings", tags=["Settings"])
 def get_settings(current_col: Collection = Depends(get_current_collection)):
     return {
@@ -426,9 +447,11 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db), current_col: Co
         image=final_image
     )
     if link.tags:
+        seen_tags = set()
         for tag_name in link.tags.split(","):
             tag_name = tag_name.strip()
-            if tag_name:
+            if tag_name and tag_name not in seen_tags:
+                seen_tags.add(tag_name)
                 new_link.tags.append(Tag(name=tag_name))
                 
     db.add(new_link)
@@ -451,9 +474,11 @@ def update_link(link_id: int, link: LinkCreate, db: Session = Depends(get_db), c
     
     db_link.tags.clear()
     if link.tags:
+        seen_tags = set()
         for tag_name in link.tags.split(","):
             tag_name = tag_name.strip()
-            if tag_name:
+            if tag_name and tag_name not in seen_tags:
+                seen_tags.add(tag_name)
                 db_link.tags.append(Tag(name=tag_name))
     
     db.commit()
