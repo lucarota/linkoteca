@@ -1,0 +1,14 @@
+[Unit]
+Description=Linkami Backend Service (Gunicorn+Uvicorn)
+After=network.target
+
+[Service]
+User=luca
+Group=www-data
+WorkingDirectory=/opt/linkami/backend
+Environment="PATH=/opt/linkami/backend/venv/bin"
+ExecStart=/opt/linkami/backend/venv/bin/gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

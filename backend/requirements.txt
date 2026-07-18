@@ -7,3 +7,4 @@ metadata_parser
 requests
 beautifulsoup4
 PyJWT
+gunicorn
