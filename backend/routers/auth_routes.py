@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import jwt
 
 from schemas import CollectionCreate
-from models import Collection
+from models import Collection, Link
 from database import get_db
 from config import JWT_SECRET
 from auth import get_password_hash, verify_password
@@ -35,3 +35,9 @@ def login(col: CollectionCreate, db: Session = Depends(get_db)):
     exp = datetime.utcnow() + timedelta(hours=1)
     jwt_token = jwt.encode({"sub": str(db_col.id), "exp": exp}, JWT_SECRET, algorithm="HS256")
     return {"token": jwt_token, "name": db_col.name}
+
+@router.get("/api/stats")
+def get_stats(db: Session = Depends(get_db)):
+    collections_count = db.query(Collection).count()
+    links_count = db.query(Link).count()
+    return {"collections": collections_count, "links": links_count}

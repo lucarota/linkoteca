@@ -6,6 +6,7 @@ function AuthScreen() {
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [stats, setStats] = useState({ links: 0, collections: 0 })
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -13,6 +14,11 @@ function AuthScreen() {
     if (savedName) {
       navigate(`/${savedName}`)
     }
+
+    fetch(`${API_URL}/stats`)
+      .then(res => res.json())
+      .then(data => setStats(data))
+      .catch(() => console.error("Failed to load stats"))
   }, [navigate])
 
   const handleAction = async (e: any, action: 'login' | 'register') => {
@@ -43,7 +49,7 @@ function AuthScreen() {
         <h1 className="font-bold tracking-tight text-4xl text-center">
           <a href="/">Linkami</a>
         </h1>
-        {/*<p className="tracking-tighter text-center">xxx links saved in yyy collections</p>*/}
+        <p className="tracking-tighter text-center">{stats.links} links saved in {stats.collections} collections</p>
         <p className="my-4 max-w-3xl mx-auto text-center text-xl text-gray-500">
           Bookmark your favourite content from any browser on any device. Fast, private, and free.
         </p>  
