@@ -16,12 +16,16 @@ To run the backend:
 
 For production, it is highly recommended to run the backend as a background service using `systemd` and `Gunicorn`. This ensures the application restarts automatically on failure and boots up with the server.
 
-To install and run the backend as a service in `/opt/linkami/backend`:
+To automatically install and run the backend as a service in `/opt/linkami/backend`, you can use the provided script:
 
 1. `cd backend`
 2. `sudo ./install.sh`
 
-This script will copy the files, create a production environment, and start the `linkami-backend` systemd service.
+**What does the script do?**
+Under the hood, the script sets up the `/opt/linkami/backend` directory and manages the `systemd` configuration using the following commands:
+- `sudo cp linkami-backend.service /etc/systemd/system/`: Copies the service configuration file to the system's service directory so systemd can recognize it.
+- `sudo systemctl enable linkami-backend`: Tells systemd to automatically start this service every time the server boots up.
+- `sudo systemctl start linkami-backend`: Starts the service immediately in the background.
 
 ## Frontend
 
