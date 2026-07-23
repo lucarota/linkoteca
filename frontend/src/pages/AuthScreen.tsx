@@ -38,7 +38,7 @@ function AuthScreen() {
       } else {
         setError(data.detail || 'Authentication failed')
       }
-    } catch (err) {
+    } catch {
       setError('Network error')
     }
   }

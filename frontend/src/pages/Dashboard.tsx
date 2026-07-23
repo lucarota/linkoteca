@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { API_URL } from '../config';
 import DropdownMenu from '../components/DropdownMenu';
@@ -9,7 +9,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
   const [totalPages, setTotalPages] = useState(1)
   const [hoveredLink, setHoveredLink] = useState<number | null>(null)
 
-  const fetchLinks = async () => {
+  const fetchLinks = useCallback(async () => {
     try {
       const token = localStorage.getItem('linkami_token')
       const headers: any = {}
@@ -29,12 +29,14 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
         setTotalPages(data.pages || 1)
         setPage(data.page || 1)
       }
-    } catch (err) {}
-  }
+    } catch {
+      // ignore
+    }
+  }, [collectionName, search, archived, page, tagsParam])
 
   useEffect(() => {
     fetchLinks()
-  }, [collectionName, search, archived, page, tagsParam])
+  }, [fetchLinks])
 
   useEffect(() => {
     setPage(1)
