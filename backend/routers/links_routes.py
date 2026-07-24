@@ -23,7 +23,7 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db), current_col: Co
         existing_link.created_at = datetime.utcnow()
         db.commit()
         db.refresh(existing_link)
-        return existing_link
+        return format_link(existing_link)
 
     final_image = link.image
     final_title = link.title
