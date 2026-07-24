@@ -25,6 +25,8 @@ function DashboardWrapper() {
       if (res.ok) {
         setColInfo(await res.json())
       } else {
+        localStorage.removeItem('linkami_name')
+        localStorage.removeItem('linkami_token')
         if (res.status === 403 || res.status === 404) {
           navigate('/')
         } else {
