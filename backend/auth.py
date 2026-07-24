@@ -19,6 +19,20 @@ def get_current_collection(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ):
+    """
+    Authenticates requests using exclusively JWT session tokens.
+    Typically used for normal web interface (frontend) requests.
+
+    Args:
+        credentials (HTTPAuthorizationCredentials): The Bearer token from the Authorization header.
+        db (Session): The SQLAlchemy database session.
+
+    Returns:
+        Collection: The authenticated user's collection.
+
+    Raises:
+        HTTPException: If the token is invalid or missing (401 Unauthorized).
+    """
     if not credentials:
         raise HTTPException(status_code=401, detail="Not authenticated")
     try:
@@ -36,6 +50,20 @@ def get_api_or_current_collection(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ):
+    """
+    Authenticates requests using either a permanent API token (AccessToken) 
+    or a JWT session token as fallback. Useful for programmatic access.
+
+    Args:
+        credentials (HTTPAuthorizationCredentials): The Bearer token from the Authorization header.
+        db (Session): The SQLAlchemy database session.
+
+    Returns:
+        Collection: The authenticated user's collection.
+
+    Raises:
+        HTTPException: If the token is invalid or missing (401 Unauthorized).
+    """
     if not credentials:
         raise HTTPException(status_code=401, detail="Not authenticated")
     token = credentials.credentials
