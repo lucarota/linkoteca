@@ -34,3 +34,24 @@ To run the frontend:
 1. `cd frontend`
 2. `npm install`
 3. `npm run dev`
+
+## Migration from Linkstore
+
+If you are migrating from Linkstore, you can use the `migrate_from_linkstore.py` script to automatically transfer all your saved links to Linkami.
+
+**How it works:**
+The script fetches your links from the Linkstore API and sends them to your Linkami instance. Please note that as a normal behavior of Linkstore, the links fetched from linkstore.app will be archived during this process.
+
+**Usage:**
+```bash
+python migrate_from_linkstore.py <LINKSTORE_TOKEN> <LINKAMI_TOKEN>
+```
+
+You will need both authorization tokens:
+- **`LINKSTORE_TOKEN`**: Found in the "Settings" page of linkstore.app.
+- **`LINKAMI_TOKEN`**: Found in the "Settings" page of Linkami.
+
+**Example:**
+```bash
+python migrate_from_linkstore.py your_linkstore_token your_linkami_token
+```
