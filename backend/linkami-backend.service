@@ -3,7 +3,7 @@ Description=Linkami Backend Service (Gunicorn+Uvicorn)
 After=network.target
 
 [Service]
-User=luca
+User=root
 Group=www-data
 WorkingDirectory=/opt/linkami/backend
 Environment="PATH=/opt/linkami/backend/venv/bin"
