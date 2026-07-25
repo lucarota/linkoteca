@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 import secrets
 from typing import List
 
@@ -12,6 +13,7 @@ router = APIRouter(tags=["Settings"])
 
 @router.get("/api/settings")
 def get_settings(current_col: Collection = Depends(get_current_collection)):
+    """Retrieves the current settings for the authenticated collection."""
     return {
         "is_public": current_col.is_public,
         "display_images": current_col.display_images,
@@ -22,6 +24,7 @@ def get_settings(current_col: Collection = Depends(get_current_collection)):
 
 @router.put("/api/settings")
 def update_settings(settings: CollectionSettings, db: Session = Depends(get_db), current_col: Collection = Depends(get_current_collection)):
+    """Updates the settings for the authenticated collection."""
     current_col.is_public = settings.is_public
     current_col.display_images = settings.display_images
     current_col.display_mode = settings.display_mode
@@ -39,7 +42,8 @@ def update_settings(settings: CollectionSettings, db: Session = Depends(get_db),
 
 @router.get("/api/settings/access_tokens", response_model=List[TokenResponse])
 def get_tokens(db: Session = Depends(get_db), current_col: Collection = Depends(get_current_collection)):
-    tokens = db.query(AccessToken).filter(AccessToken.collection_id == current_col.id).all()
+    """Lists all access tokens for the collection, masking their full values."""
+    tokens = db.scalars(select(AccessToken).filter(AccessToken.collection_id == current_col.id)).all()
     result = []
     for t in tokens:
         masked = t.token[:3] + "*" * 29 if len(t.token) > 3 else "***"
@@ -48,6 +52,7 @@ def get_tokens(db: Session = Depends(get_db), current_col: Collection = Depends(
 
 @router.post("/api/settings/access_token", response_model=TokenResponse)
 def create_access_token(db: Session = Depends(get_db), current_col: Collection = Depends(get_current_collection)):
+    """Generates and stores a new permanent access token."""
     token_str = secrets.token_urlsafe(32)
     new_token = AccessToken(collection_id=current_col.id, token=token_str)
     db.add(new_token)
@@ -57,7 +62,8 @@ def create_access_token(db: Session = Depends(get_db), current_col: Collection =
 
 @router.delete("/api/settings/access_token/{token_id}")
 def delete_access_token(token_id: int, db: Session = Depends(get_db), current_col: Collection = Depends(get_current_collection)):
-    token = db.query(AccessToken).filter(AccessToken.id == token_id, AccessToken.collection_id == current_col.id).first()
+    """Revokes and deletes an access token by its ID."""
+    token = db.scalar(select(AccessToken).filter(AccessToken.id == token_id, AccessToken.collection_id == current_col.id))
     if token:
         db.delete(token)
         db.commit()

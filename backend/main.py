@@ -22,6 +22,7 @@ app = FastAPI(
 
 class DynamicCORSMiddleware:
     def __init__(self, app: ASGIApp):
+        """Initializes the DynamicCORSMiddleware with different CORS policies."""
         self.app = app
         
         self.frontend_cors = CORSMiddleware(
@@ -41,6 +42,7 @@ class DynamicCORSMiddleware:
         )
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        """Dynamically applies public or frontend CORS based on the request path."""
         if scope["type"] == "http":
             path = scope.get("path", "")
             if path == "/api/link":

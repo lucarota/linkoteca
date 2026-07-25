@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, select, func
 from typing import Optional
 from datetime import datetime
 import math
@@ -18,7 +18,8 @@ router = APIRouter(tags=["Links"])
 
 @router.post("/api/link", response_model=LinkResponse)
 def create_link(link: LinkCreate, db: Session = Depends(get_db), current_col: Collection = Depends(get_api_or_current_collection)):
-    existing_link = db.query(Link).filter(Link.collection_id == current_col.id, Link.url == link.url).first()
+    """Creates a new link in the collection or updates its creation time if it already exists."""
+    existing_link = db.scalar(select(Link).filter(Link.collection_id == current_col.id, Link.url == link.url))
     if existing_link:
         existing_link.created_at = datetime.utcnow()
         db.commit()
@@ -61,7 +62,8 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db), current_col: Co
 
 @router.put("/api/link/{link_id}", response_model=LinkResponse)
 def update_link(link_id: int, link: LinkCreate, db: Session = Depends(get_db), current_col: Collection = Depends(get_current_collection)):
-    db_link = db.query(Link).filter(Link.id == link_id, Link.collection_id == current_col.id).first()
+    """Updates the details and tags of an existing link."""
+    db_link = db.scalar(select(Link).filter(Link.id == link_id, Link.collection_id == current_col.id))
     if not db_link:
         raise HTTPException(status_code=404, detail="Link not found")
     
@@ -85,20 +87,22 @@ def update_link(link_id: int, link: LinkCreate, db: Session = Depends(get_db), c
 
 @router.get("/api/link/{link_id}", response_model=LinkResponse)
 def get_single_link(link_id: int, db: Session = Depends(get_db), current_col: Collection = Depends(get_current_collection)):
-    db_link = db.query(Link).filter(Link.id == link_id, Link.collection_id == current_col.id).first()
+    """Retrieves a single link by its ID."""
+    db_link = db.scalar(select(Link).filter(Link.id == link_id, Link.collection_id == current_col.id))
     if not db_link:
         raise HTTPException(status_code=404, detail="Link not found")
     return format_link(db_link)
 
 @router.get("/api/link")
 def get_link(tags: Optional[str] = None, db: Session = Depends(get_db), current_col: Collection = Depends(get_api_or_current_collection)):
-    query = db.query(Link).filter(Link.collection_id == current_col.id, Link.archived == False)
+    """Fetches the oldest unarchived link (optionally filtered by tags) and archives it."""
+    query = select(Link).filter(Link.collection_id == current_col.id, Link.archived == False)
     if tags:
         tag_list = [t.strip() for t in tags.split(",")]
         for tag in tag_list:
             if tag:
                 query = query.filter(Link.tags.any(Tag.name.like(f"%{tag}%")))
-    link = query.order_by(Link.created_at.asc()).first()
+    link = db.scalars(query.order_by(Link.created_at.asc())).first()
     if not link:
         raise HTTPException(status_code=404, detail="No unarchived links found")
     link.archived = True
@@ -108,9 +112,10 @@ def get_link(tags: Optional[str] = None, db: Session = Depends(get_db), current_
 
 @router.get("/api/links/{name}", response_model=PaginatedLinksResponse)
 def get_collection_links(page: int = 1, archived: Optional[bool] = None, q: Optional[str] = None, tags: Optional[str] = None, db: Session = Depends(get_db), access_info: dict = Depends(verify_collection_access)):
+    """Fetches a paginated list of links for a collection, supporting search and filtering."""
     col = access_info["col"]
 
-    query = db.query(Link).filter(Link.collection_id == col.id)
+    query = select(Link).filter(Link.collection_id == col.id)
     if archived is not None:
         query = query.filter(Link.archived == archived)
     if q:
@@ -121,7 +126,7 @@ def get_collection_links(page: int = 1, archived: Optional[bool] = None, q: Opti
             if tag:
                 query = query.filter(Link.tags.any(Tag.name.like(f"%{tag}%")))
         
-    total = query.count()
+    total = db.scalar(select(func.count()).select_from(query.subquery()))
     links_per_page = col.links_per_page or 20
     pages = math.ceil(total / links_per_page) if total > 0 else 1
     
@@ -131,13 +136,14 @@ def get_collection_links(page: int = 1, archived: Optional[bool] = None, q: Opti
         page = pages
         
     offset = (page - 1) * links_per_page
-    items = query.order_by(Link.created_at.desc()).offset(offset).limit(links_per_page).all()
+    items = db.scalars(query.order_by(Link.created_at.desc()).offset(offset).limit(links_per_page)).all()
     
     return {"items": [format_link(item) for item in items], "total": total, "page": page, "pages": pages}
 
 @router.delete("/api/link/{link_id}")
 def delete_link(link_id: int, db: Session = Depends(get_db), current_col: Collection = Depends(get_current_collection)):
-    link = db.query(Link).filter(Link.id == link_id, Link.collection_id == current_col.id).first()
+    """Deletes a link permanently."""
+    link = db.scalar(select(Link).filter(Link.id == link_id, Link.collection_id == current_col.id))
     if link:
         db.delete(link)
         db.commit()
@@ -145,7 +151,8 @@ def delete_link(link_id: int, db: Session = Depends(get_db), current_col: Collec
 
 @router.post("/api/link/{link_id}/archive")
 def archive_link(link_id: int, archived: bool = True, db: Session = Depends(get_db), current_col: Collection = Depends(get_current_collection)):
-    link = db.query(Link).filter(Link.id == link_id, Link.collection_id == current_col.id).first()
+    """Changes the archive status of a link."""
+    link = db.scalar(select(Link).filter(Link.id == link_id, Link.collection_id == current_col.id))
     if link:
         link.archived = archived
         db.commit()

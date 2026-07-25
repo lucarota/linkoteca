@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from models import Link
 
 def fetch_metadata_for_url(url: str) -> dict:
+    """Fetches the title, description, and preview image metadata for a given URL."""
     result = {'title': None, 'description': None, 'image': None}
     try:
         page = metadata_parser.MetadataParser(url=url, search_head_only=False)
@@ -95,6 +96,7 @@ def fetch_metadata_for_url(url: str) -> dict:
     return result
 
 def format_link(link: Link) -> dict:
+    """Formats a Link SQLAlchemy model into a dictionary for API responses."""
     return {
         "id": link.id,
         "url": link.url,

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import select, func
 from datetime import datetime, timedelta
 import jwt
 
@@ -13,7 +14,8 @@ router = APIRouter(tags=["Authentication"])
 
 @router.post("/api/register")
 def register(col: CollectionCreate, db: Session = Depends(get_db)):
-    db_col = db.query(Collection).filter(Collection.name == col.name).first()
+    """Registers a new collection and returns a JWT token."""
+    db_col = db.scalar(select(Collection).filter(Collection.name == col.name))
     if db_col:
         raise HTTPException(status_code=400, detail="Name already registered")
     hashed_password = get_password_hash(col.password)
@@ -28,7 +30,8 @@ def register(col: CollectionCreate, db: Session = Depends(get_db)):
 
 @router.post("/api/login")
 def login(col: CollectionCreate, db: Session = Depends(get_db)):
-    db_col = db.query(Collection).filter(Collection.name == col.name).first()
+    """Authenticates a collection login and returns a JWT token."""
+    db_col = db.scalar(select(Collection).filter(Collection.name == col.name))
     if not db_col or not verify_password(col.password, db_col.password_hash):
         raise HTTPException(status_code=400, detail="Incorrect name or password")
     
@@ -38,6 +41,7 @@ def login(col: CollectionCreate, db: Session = Depends(get_db)):
 
 @router.get("/api/stats")
 def get_stats(db: Session = Depends(get_db)):
-    collections_count = db.query(Collection).count()
-    links_count = db.query(Link).count()
+    """Retrieves global statistics about collections and links."""
+    collections_count = db.scalar(select(func.count()).select_from(Collection))
+    links_count = db.scalar(select(func.count()).select_from(Link))
     return {"collections": collections_count, "links": links_count}
