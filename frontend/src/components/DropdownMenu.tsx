@@ -47,9 +47,15 @@ function DropdownMenu({ link, isOwner, onArchive, onDelete, isOpen, onToggle }: 
               Edit
             </a>
             <a onClick={(e) => { e.preventDefault(); onArchive(link.id, !link.archived); handleSetOpen(false); }} className="cursor-pointer group flex hover:bg-gray-100 items-center px-4 py-2 hover:text-gray-900">
-              <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
+              {link.archived ? (
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                </svg>
+              ) : (
+                <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              )}
               {link.archived ? 'Unarchive' : 'Archive'}
             </a>
             <a onClick={(e) => { e.preventDefault(); if (window.confirm("Are you sure you want to delete this link?")) { onDelete(link.id); } handleSetOpen(false); }} className="cursor-pointer hover:bg-gray-100 hover:text-red-600 group flex items-center px-4 py-2 text-sm">
