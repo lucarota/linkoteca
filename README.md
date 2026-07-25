@@ -55,3 +55,7 @@ You will need both authorization tokens:
 ```bash
 python migrate_from_linkstore.py your_linkstore_token your_linkami_token
 ```
+
+## Credits
+
+The SVG icons used in this project are provided by [Heroicons](https://heroicons.com/).
