@@ -59,3 +59,17 @@ python migrate_from_linkstore.py your_linkstore_token your_linkami_token
 ## Credits
 
 The SVG icons used in this project are provided by [Heroicons](https://heroicons.com/).
+
+## Version History
+See [CHANGELOG.md](https://github.com/lucarota/linkami/blob/master/CHANGELOG.md).
+
+## Contributing
+We welcome contributions! Please review the following guides:
+
+- [Contributing Guidelines](https://github.com/lucarota/linkami/blob/master/CONTRIBUTING.md)
+- [Code of Conduct](https://github.com/lucarota/linkami/blob/master/.github/CODE-OF-CONDUCT.md)
+
+Also, consider sponsoring this project! ✌️
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
