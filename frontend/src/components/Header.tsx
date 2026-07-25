@@ -26,7 +26,7 @@ function Header({ collectionName, isOwner, search, setSearch}: any) {
   }
 
   return (
-    <header className="mx-auto text-xs rounded-t-none rounded-r-none border-b z-0">
+    <header className="mx-auto text-xs rounded-t-none rounded-r-none border-b border-gray-200 z-0">
       <div className="flex border-b bg-gray-50 border-gray-200 items-center justify-center text-gray-900">
         <h2 className="hover:text-blue-600 py-0.5 mx-2 text-gray-600 cursor-pointer" onClick={() => navigate(`/${collectionName}`)}>
           {collectionName}

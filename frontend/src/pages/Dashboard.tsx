@@ -8,6 +8,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [hoveredLink, setHoveredLink] = useState<number | null>(null)
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null)
 
   const fetchLinks = useCallback(async () => {
     try {
@@ -98,12 +99,12 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
         {displayMode === 'grid' ? (
           <ul className="grid grid-cols-1 gap-2 md:gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {links.map(link => (
-              <li key={link.id} className="col-span-1 border-b md:border-none flex flex-col text-center">
+              <li key={link.id} className={`col-span-1 border-b md:border-none flex flex-col text-center relative ${openMenuId === link.id ? 'z-50' : ''}`}>
                 <div className="text-xs break-all border-gray-200 flex justify-between items-center">
                   <a href={link.url} title={link.url} target="_blank" rel="noopener noreferrer" className="py-1 truncate font-light break-all hover:text-blue-600">
                     {link.url}
                   </a>
-                  <DropdownMenu link={link} isOwner={isOwner} onArchive={archiveLink} onDelete={deleteLink} />
+                  <DropdownMenu link={link} isOwner={isOwner} onArchive={archiveLink} onDelete={deleteLink} isOpen={openMenuId === link.id} onToggle={(val: boolean) => setOpenMenuId(val ? link.id : null)} />
                 </div>
                 <div className="object-contain pt-2 overflow-x-hidden grow">
                   {displayImages && (
@@ -159,13 +160,13 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
         ) : (
           <div>
             {links.map(link => (
-              <div key={link.id} className={`py-5 border-b-2 border-gray-100 break-all relative ${hoveredLink === link.id ? 'z-50' : 'z-0'}`}>
+              <div key={link.id} className={`py-5 border-b-2 border-gray-100 break-all relative ${hoveredLink === link.id || openMenuId === link.id ? 'z-50' : ''}`}>
                 <div className="flex flex-col">
                   <div className="flex">
                     <a href={link.url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 truncate font-light text-xs py-2 break-all w-full text-gray-600 flex-1">
                       {link.url}
                     </a>
-                    <DropdownMenu link={link} isOwner={isOwner} onArchive={archiveLink} onDelete={deleteLink} />
+                    <DropdownMenu link={link} isOwner={isOwner} onArchive={archiveLink} onDelete={deleteLink} isOpen={openMenuId === link.id} onToggle={(val: boolean) => setOpenMenuId(val ? link.id : null)} />
                   </div>
                   <div className="flex justify-between items-start mt-2">
                     <div className="overflow-hidden flex-1 pr-4">
