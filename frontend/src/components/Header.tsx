@@ -28,18 +28,18 @@ function Header({ collectionName, isOwner, search, setSearch}: any) {
   return (
     <header className="mx-auto text-xs rounded-t-none rounded-r-none border-b z-0">
       <div className="flex border-b bg-gray-50 border-gray-200 items-center justify-center text-gray-900">
-        <h1 className="hover:text-blue-600 py-0.5 mx-2 text-gray-600 cursor-pointer" onClick={() => navigate(`/${collectionName}`)}>
+        <h2 className="hover:text-blue-600 py-0.5 mx-2 text-gray-600 cursor-pointer" onClick={() => navigate(`/${collectionName}`)}>
           {collectionName}
-        </h1>
+        </h2>
 
-        <div className="flex sm:flex-row flex-col sm:py-2 md:flex-grow-0 md:order-none">
+        <div className="flex sm:flex-row flex-col sm:py-2 md:grow-0 md:order-0">
           {isOwner && (
             <div className="flex items-center">
               <form onSubmit={handleSave} className="items-center w-full flex my-1 mx-2 md:my-0">
                 <div className="flex w-full">
-                  <div className="relative flex items-stretch flex-grow focus-within:z-10">
+                  <div className="relative flex items-stretch grow focus-within:z-10">
                     <input 
-                      className="shadow-inner w-full appearance-none rounded-none rounded-l-sm block text-xs text-gray-700 placeholder-gray-600 py-2 border border-gray-300 p-1 px-3 leading-3 focus:outline-none" 
+                      className="shadow-inner w-full appearance-none rounded-none rounded-l-sm block text-xs text-gray-700 py-2 border border-gray-300 p-1 px-3 leading-3 focus:outline-none"
                       placeholder="Save URL" 
                       type="url" 
                       value={newUrl}
@@ -55,9 +55,9 @@ function Header({ collectionName, isOwner, search, setSearch}: any) {
 
           <div className="flex items-center">
             <form className="items-center w-full flex my-1 mx-2 md:my-0" onSubmit={e => e.preventDefault()}>
-              <div className="relative flex items-stretch flex-grow focus-within:z-10">
+              <div className="relative flex items-stretch grow focus-within:z-10">
                 <input 
-                  className="shadow-inner w-full appearance-none rounded-none rounded-l-sm block text-xs text-gray-700 placeholder-gray-600 py-2 border border-gray-300 px-3 p-1 leading-3 focus:outline-none" 
+                  className="shadow-inner w-full appearance-none rounded-none rounded-l-sm block text-xs text-gray-700 py-2 border border-gray-300 px-3 p-1 leading-3 focus:outline-none"
                   placeholder="Search" 
                   type="text" 
                   value={search}

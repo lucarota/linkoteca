@@ -73,7 +73,7 @@ function AuthScreen() {
               <div className="w-full flex flex-col justify-center items-center">
                 <div className="w-full flex flex-col justify-center items-center pt-5">
                   <input 
-                    className="placeholder-gray-600 w-full appearance-none block text-gray-700 border text-lg border-gray-200 rounded p-3 py-4 leading-3 focus:outline-none" 
+                    className="w-full appearance-none block text-gray-700 border text-lg border-gray-200 rounded p-3 py-4 leading-3 focus:outline-none"
                     placeholder="Enter collection name" 
                     type="text" 
                     value={name}
@@ -83,7 +83,7 @@ function AuthScreen() {
                 </div>
                 <div className="w-full flex flex-col justify-center items-center pt-5">
                   <input 
-                    className="placeholder-gray-600 w-full appearance-none block text-gray-700 border text-lg border-gray-200 rounded p-3 py-4 leading-3 focus:outline-none" 
+                    className="w-full appearance-none block text-gray-700 border text-lg border-gray-200 rounded p-3 py-4 leading-3 focus:outline-none"
                     placeholder="Enter password" 
                     type="password" 
                     value={password}

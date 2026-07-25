@@ -83,7 +83,7 @@ function EditScreen() {
                   <div className="my-4">
                     <label className="my-2 block text-sm font-medium leading-5 text-gray-700">Title</label>
                     <textarea 
-                      className="w-full p-3 appearance-none block my-2 text-gray-700 border text-md border-gray-200 rounded px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+                      className="w-full p-3 appearance-none block my-2 text-gray-700 border text-md border-gray-200 rounded px-4 leading-tight focus:outline-none focus:bg-white"
                       rows={2}
                       value={link.title || ''}
                       onChange={e => setLink({...link, title: e.target.value})}
@@ -93,7 +93,7 @@ function EditScreen() {
                   <div className="my-4">
                     <label className="my-2 block text-sm font-medium leading-5 text-gray-700">Description</label>
                     <textarea 
-                      className="w-full p-3 appearance-none block my-2 text-gray-700 border text-md border-gray-200 rounded px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+                      className="w-full p-3 appearance-none block my-2 text-gray-700 border text-md border-gray-200 rounded px-4 leading-tight focus:outline-none focus:bg-white"
                       rows={5}
                       value={link.description || ''}
                       onChange={e => setLink({...link, description: e.target.value})}
@@ -104,7 +104,7 @@ function EditScreen() {
                     <label className="my-2 block text-sm font-medium leading-5 text-gray-700">Preview image URL</label>
                     <input 
                       type="url"
-                      className="w-full p-3 appearance-none block text-gray-700 border text-md border-gray-200 rounded px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+                      className="w-full p-3 appearance-none block text-gray-700 border text-md border-gray-200 rounded px-4 leading-tight focus:outline-none focus:bg-white"
                       value={link.image || ''}
                       onChange={e => setLink({...link, image: e.target.value})}
                       placeholder="Enter URL"
@@ -114,7 +114,7 @@ function EditScreen() {
                     <label className="my-2 block text-sm font-medium leading-5 text-gray-700">Create new tags</label>
                     <input 
                       type="text"
-                      className="w-full p-3 appearance-none block text-gray-700 border text-md border-gray-200 rounded px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+                      className="w-full p-3 appearance-none block text-gray-700 border text-md border-gray-200 rounded px-4 leading-tight focus:outline-none focus:bg-white"
                       value={newTagsString}
                       onChange={e => setNewTagsString(e.target.value)}
                       placeholder="comma separate tags to assign multiple at once"

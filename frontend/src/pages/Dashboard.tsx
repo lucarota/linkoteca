@@ -82,7 +82,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
             <div className="flex items-center ">   
               <div className="px-2 flex justify-between  text-gray-700">
                 <a className={`${page <= 1 ? 'disabled-link text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:text-blue-600'} relative inline-flex items-center text-xs leading-5 font-medium rounded-md px-2`} onClick={() => page > 1 && setPage(page - 1)}>Previous</a>
-                <div className="flex flex-shrink-0 px-2">
+                <div className="flex shrink-0 px-2">
                   <p className="text-xs leading-5  text-gray-700">
                     <span className="font-medium">{page}</span>
                     /
@@ -105,7 +105,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
                   </a>
                   <DropdownMenu link={link} isOwner={isOwner} onArchive={archiveLink} onDelete={deleteLink} />
                 </div>
-                <div className="object-contain pt-2 overflow-x-hidden flex-grow">
+                <div className="object-contain pt-2 overflow-x-hidden grow">
                   {displayImages && (
                     <a href={link.url} rel="noopener noreferrer" target="_blank">
                       <div className="text-left pb-2">
@@ -189,7 +189,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
                     </div>
                     {displayImages && link.image && (
                       <div 
-                        className="flex-shrink-0 relative ml-4 w-32 h-32"
+                        className="shrink-0 relative ml-4 w-32 h-32"
                         onMouseEnter={() => setHoveredLink(link.id)}
                         onMouseLeave={() => setHoveredLink(null)}
                       >
@@ -203,7 +203,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
                           />
                         </a>
                         {hoveredLink === link.id && (
-                          <div className="absolute right-full top-0 mr-4 z-[9999] shadow-2xl bg-white border border-gray-200 p-2 rounded-lg pointer-events-none w-max" style={{ minWidth: '200px' }}>
+                          <div className="absolute right-full top-0 mr-4 z-9999 shadow-2xl bg-white border border-gray-200 p-2 rounded-lg pointer-events-none w-max" style={{ minWidth: '200px' }}>
                             <img 
                               src={link.image} 
                               alt="thumbnail-full" 

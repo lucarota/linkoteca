@@ -90,11 +90,11 @@ function SettingsScreen() {
                     <legend className="text-base font-medium text-gray-900">Rich previews</legend>
                     <div className="mt-4">
                       <div className="flex items-center">
-                        <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={settings.display_images === true} onChange={() => updateSetting('display_images', true)} />
+                        <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={settings.display_images} onChange={() => updateSetting('display_images', true)} />
                         <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">Enabled</label>
                       </div>
                       <div className="mt-4 flex items-center">
-                        <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={settings.display_images === false} onChange={() => updateSetting('display_images', false)} />
+                        <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={!settings.display_images} onChange={() => updateSetting('display_images', false)} />
                         <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">Disabled</label>
                       </div>
                     </div>
@@ -166,7 +166,7 @@ function SettingsScreen() {
                               </p>
                             )}
                             <span className="inline-flex rounded-md shadow-sm">
-                              <button onClick={createToken} className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                              <button onClick={createToken} className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                 {tokens.length > 0 ? 'Generate New API Token' : 'Create API Token'}
                               </button>
                             </span>
