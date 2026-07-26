@@ -5,12 +5,12 @@ import time
 
 def print_help():
     print("ERROR: Missing required information.")
-    print("Usage: python migrate_from_linkstore.py <LINKSTORE_TOKEN> <LINKAMI_TOKEN>")
+    print("Usage: python migrate_from_linkstore.py <LINKSTORE_TOKEN> <LINKOTECA_TOKEN>")
     print("\nBoth tokens are required to authorize the migration:")
     print(" - LINKSTORE_TOKEN: You can find it in the 'Settings' page of linkstore.app.")
-    print(" - LINKAMI_TOKEN: You can find it in the 'Settings' page of Linkami.")
+    print(" - LINKOTECA_TOKEN: You can find it in the 'Settings' page of Linkoteca.")
     print("\nExample:")
-    print("  python migrate_from_linkstore.py your_linkstore_token your_linkami_token")
+    print("  python migrate_from_linkstore.py your_linkstore_token your_linkoteca_token")
     sys.exit(1)
 
 def main():
@@ -18,24 +18,24 @@ def main():
         print_help()
         
     linkstore_token = sys.argv[1]
-    linkami_token = sys.argv[2]
+    linkoteca_token = sys.argv[2]
     
     linkstore_url = "https://linkstore.app/api/link"
-    linkami_url = "http://api.rotaliano.it/api/link"
+    linkoteca_url = "http://api.rotaliano.it/api/link"
     
     linkstore_headers = {
         "X-ACCESS-TOKEN": linkstore_token
     }
     
-    linkami_headers = {
+    linkoteca_headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {linkami_token}"
+        "Authorization": f"Bearer {linkoteca_token}"
     }
     
     previous_url = None
     count = 0
     
-    print("Starting migration from Linkstore to Linkami...")
+    print("Starting migration from Linkstore to Linkoteca...")
     
     while True:
         try:
@@ -52,12 +52,12 @@ def main():
                 print("Note: The links on linkstore.app have been archived, which is the normal behavior of Linkstore.")
                 break
                 
-            print(f"[{count+1}] Sending '{current_url}' to Linkami... ", end="", flush=True)
+            print(f"[{count+1}] Sending '{current_url}' to Linkoteca... ", end="", flush=True)
             
-            # 2. Send the URL to linkami using POST JSON
+            # 2. Send the URL to linkoteca using POST JSON
             payload = {"url": current_url}
-            res_linkami = requests.post(linkami_url, json=payload, headers=linkami_headers)
-            res_linkami.raise_for_status()
+            res_linkoteca = requests.post(linkoteca_url, json=payload, headers=linkoteca_headers)
+            res_linkoteca.raise_for_status()
             
             print("OK")
             

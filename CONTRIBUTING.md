@@ -18,7 +18,7 @@
 
 ## :book: Code of Conduct
 
-Please review our [Code of Conduct](https://github.com/lucarota/linkami/blob/master/CODE-OF-CONDUCT.md). It is in effect at all times. We expect it to be honored by everyone who contributes to this project. Acting like an asshole will not be tolerated.
+Please review our [Code of Conduct](https://github.com/lucarota/linkoteca/blob/master/CODE-OF-CONDUCT.md). It is in effect at all times. We expect it to be honored by everyone who contributes to this project. Acting like an asshole will not be tolerated.
 
 ## :inbox_tray: Opening an Issue
 

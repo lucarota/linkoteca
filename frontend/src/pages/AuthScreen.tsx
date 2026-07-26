@@ -10,7 +10,7 @@ function AuthScreen() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const savedName = localStorage.getItem('linkami_name')
+    const savedName = localStorage.getItem('linkoteca_name')
     if (savedName) {
       navigate(`/${savedName}`)
     }
@@ -32,8 +32,8 @@ function AuthScreen() {
       })
       const data = await res.json()
       if (res.ok) {
-        localStorage.setItem('linkami_token', data.token)
-        localStorage.setItem('linkami_name', name)
+        localStorage.setItem('linkoteca_token', data.token)
+        localStorage.setItem('linkoteca_name', name)
         navigate(`/${name}`)
       } else {
         setError(data.detail || 'Authentication failed')
@@ -47,7 +47,7 @@ function AuthScreen() {
     <div className="container mx-auto max-w-3xl p-4 py-10">
       <header>
         <h1 className="font-bold tracking-tight text-4xl text-center">
-          <a href="/">Linkami</a>
+          <a href="/">Linkoteca</a>
         </h1>
         <p className="tracking-tighter text-center">{stats.links} links saved in {stats.collections} collections</p>
         <p className="my-4 max-w-3xl mx-auto text-center text-xl text-gray-500">

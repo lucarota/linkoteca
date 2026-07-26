@@ -1,5 +1,5 @@
 /.idea/
 .env
-backend/linkami.db
+backend/linkoteca.db
 package-lock.json
 **/__pycache__

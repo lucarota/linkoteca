@@ -1,4 +1,4 @@
-# Linkami
+# Linkoteca
 
 This is a free reimplementation of linkstore.app built with Python and React.
 
@@ -16,16 +16,16 @@ To run the backend:
 
 For production, it is highly recommended to run the backend as a background service using `systemd` and `Gunicorn`. This ensures the application restarts automatically on failure and boots up with the server.
 
-To automatically install and run the backend as a service in `/opt/linkami/backend`, you can use the provided script:
+To automatically install and run the backend as a service in `/opt/linkoteca/backend`, you can use the provided script:
 
 1. `cd backend`
 2. `sudo ./install.sh`
 
 **What does the script do?**
-Under the hood, the script sets up the `/opt/linkami/backend` directory and manages the `systemd` configuration using the following commands:
-- `sudo cp linkami-backend.service /etc/systemd/system/`: Copies the service configuration file to the system's service directory so systemd can recognize it.
-- `sudo systemctl enable linkami-backend`: Tells systemd to automatically start this service every time the server boots up.
-- `sudo systemctl start linkami-backend`: Starts the service immediately in the background.
+Under the hood, the script sets up the `/opt/linkoteca/backend` directory and manages the `systemd` configuration using the following commands:
+- `sudo cp linkoteca-backend.service /etc/systemd/system/`: Copies the service configuration file to the system's service directory so systemd can recognize it.
+- `sudo systemctl enable linkoteca-backend`: Tells systemd to automatically start this service every time the server boots up.
+- `sudo systemctl start linkoteca-backend`: Starts the service immediately in the background.
 
 ## Frontend
 
@@ -37,23 +37,23 @@ To run the frontend:
 
 ## Migration from Linkstore
 
-If you are migrating from Linkstore, you can use the `migrate_from_linkstore.py` script to automatically transfer all your saved links to Linkami.
+If you are migrating from Linkstore, you can use the `migrate_from_linkstore.py` script to automatically transfer all your saved links to Linkoteca.
 
 **How it works:**
-The script fetches your links from the Linkstore API and sends them to your Linkami instance. Please note that as a normal behavior of Linkstore, the links fetched from linkstore.app will be archived during this process.
+The script fetches your links from the Linkstore API and sends them to your Linkoteca instance. Please note that as a normal behavior of Linkstore, the links fetched from linkstore.app will be archived during this process.
 
 **Usage:**
 ```bash
-python migrate_from_linkstore.py <LINKSTORE_TOKEN> <LINKAMI_TOKEN>
+python migrate_from_linkstore.py <LINKSTORE_TOKEN> <LINKOTECA_TOKEN>
 ```
 
 You will need both authorization tokens:
 - **`LINKSTORE_TOKEN`**: Found in the "Settings" page of linkstore.app.
-- **`LINKAMI_TOKEN`**: Found in the "Settings" page of Linkami.
+- **`LINKOTECA_TOKEN`**: Found in the "Settings" page of Linkoteca.
 
 **Example:**
 ```bash
-python migrate_from_linkstore.py your_linkstore_token your_linkami_token
+python migrate_from_linkstore.py your_linkstore_token your_linkoteca_token
 ```
 
 ## Credits
@@ -61,13 +61,13 @@ python migrate_from_linkstore.py your_linkstore_token your_linkami_token
 The SVG icons used in this project are provided by [Heroicons](https://heroicons.com/).
 
 ## Version History
-See [CHANGELOG.md](https://github.com/lucarota/linkami/blob/master/CHANGELOG.md).
+See [CHANGELOG.md](https://github.com/lucarota/linkoteca/blob/master/CHANGELOG.md).
 
 ## Contributing
 We welcome contributions! Please review the following guides:
 
-- [Contributing Guidelines](https://github.com/lucarota/linkami/blob/master/CONTRIBUTING.md)
-- [Code of Conduct](https://github.com/lucarota/linkami/blob/master/.github/CODE-OF-CONDUCT.md)
+- [Contributing Guidelines](https://github.com/lucarota/linkoteca/blob/master/CONTRIBUTING.md)
+- [Code of Conduct](https://github.com/lucarota/linkoteca/blob/master/.github/CODE-OF-CONDUCT.md)
 
 Also, consider sponsoring this project! ✌️
 

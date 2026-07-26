@@ -9,10 +9,10 @@ function SettingsScreen() {
   const [settings, setSettings] = useState({ is_public: false, display_images: true, display_mode: 'list', links_per_page: 20 })
   const [tokens, setTokens] = useState<any[]>([])
   const [newToken, setNewToken] = useState('')
-  const token = localStorage.getItem('linkami_token')
+  const token = localStorage.getItem('linkoteca_token')
 
   useEffect(() => {
-    if (!token || localStorage.getItem('linkami_name') !== collectionName) {
+    if (!token || localStorage.getItem('linkoteca_name') !== collectionName) {
       navigate('/')
       return
     }

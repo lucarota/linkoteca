@@ -12,7 +12,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
 
   const fetchLinks = useCallback(async () => {
     try {
-      const token = localStorage.getItem('linkami_token')
+      const token = localStorage.getItem('linkoteca_token')
       const headers: any = {}
       if (token) headers['Authorization'] = `Bearer ${token}`
       
@@ -45,7 +45,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
 
   const deleteLink = async (id: number) => {
     if (!isOwner) return
-    const token = localStorage.getItem('linkami_token')
+    const token = localStorage.getItem('linkoteca_token')
     await fetch(`${API_URL}/link/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
@@ -55,7 +55,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
 
   const archiveLink = async (id: number, archived_val: boolean) => {
     if (!isOwner) return
-    const token = localStorage.getItem('linkami_token')
+    const token = localStorage.getItem('linkoteca_token')
     await fetch(`${API_URL}/link/${id}/archive?archived=${archived_val}`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` }

@@ -9,7 +9,7 @@ function Header({ collectionName, isOwner, search, setSearch}: any) {
   const handleSave = async (e: any) => {
     e.preventDefault()
     if (!newUrl) return
-    const token = localStorage.getItem('linkami_token')
+    const token = localStorage.getItem('linkoteca_token')
     await fetch(`${API_URL}/link`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -20,8 +20,8 @@ function Header({ collectionName, isOwner, search, setSearch}: any) {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('linkami_token')
-    localStorage.removeItem('linkami_name')
+    localStorage.removeItem('linkoteca_token')
+    localStorage.removeItem('linkoteca_name')
     navigate('/')
   }
 

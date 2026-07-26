@@ -9,8 +9,8 @@ from routers import auth_routes, collections_routes, settings_routes, links_rout
 init_db()
 
 app = FastAPI(
-    title="Linkami API",
-    description="Backend API for Linkami, a self-hosted bookmarking tool to save your favorite links in collections. Organize, search and preview your web links with ease.",
+    title="Linkoteca API",
+    description="Backend API for Linkoteca, a self-hosted bookmarking tool to save your favorite links in collections. Organize, search and preview your web links with ease.",
     version="1.0.0",
     openapi_tags=[
         {"name": "Authentication", "description": "Operations for registration and login."},

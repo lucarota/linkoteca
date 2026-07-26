@@ -17,7 +17,7 @@ function DashboardWrapper() {
 
   useEffect(() => {
     const fetchInfo = async () => {
-      const token = localStorage.getItem('linkami_token')
+      const token = localStorage.getItem('linkoteca_token')
       const headers: any = {}
       if (token) headers['Authorization'] = `Bearer ${token}`
       
@@ -25,8 +25,8 @@ function DashboardWrapper() {
       if (res.ok) {
         setColInfo(await res.json())
       } else {
-        localStorage.removeItem('linkami_name')
-        localStorage.removeItem('linkami_token')
+        localStorage.removeItem('linkoteca_name')
+        localStorage.removeItem('linkoteca_token')
         if (res.status === 403 || res.status === 404) {
           navigate('/')
         } else {

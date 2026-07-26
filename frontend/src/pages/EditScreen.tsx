@@ -14,7 +14,7 @@ function EditScreen() {
 
     useEffect(() => {
         const fetchLinkAndTags = async () => {
-            const token = localStorage.getItem('linkami_token')
+            const token = localStorage.getItem('linkoteca_token')
             const headers = {'Authorization': `Bearer ${token}`}
 
             const [linkRes, tagsRes] = await Promise.all([
@@ -51,7 +51,7 @@ function EditScreen() {
 
     const handleSave = async (e: any) => {
         e.preventDefault()
-        const token = localStorage.getItem('linkami_token')
+        const token = localStorage.getItem('linkoteca_token')
         await fetch(`${API_URL}/link/${linkId}`, {
             method: 'PUT',
             headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},

@@ -1,6 +1,6 @@
-# Linkami Backend
+# Linkoteca Backend
 
-This is the backend API for the Linkami application, built with FastAPI and SQLite.
+This is the backend API for the Linkoteca application, built with FastAPI and SQLite.
 
 ## Prerequisites
 
@@ -48,4 +48,4 @@ The API will be available at `http://localhost:8000`. You can also access the in
 
 ## Database
 
-The application uses a local SQLite database named `linkami.db`. It is automatically generated and managed by SQLAlchemy when the application starts for the first time.
+The application uses a local SQLite database named `linkoteca.db`. It is automatically generated and managed by SQLAlchemy when the application starts for the first time.
