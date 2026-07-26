@@ -221,7 +221,36 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
             ))}
           </div>
         )}
-        {links.length === 0 && <div className="py-10 text-center text-gray-500">No links found.</div>}
+        {links.length === 0 && (
+          archived ? (
+            <div className="py-10 text-center text-gray-500">No links archived.</div>
+          ) : (
+            <div className="py-10">
+              <div className="max-w-3xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Get started saving links</h3>
+                  <p className="mt-2 text-base text-gray-800">Use the input at the top of the page to save a link. Rich previews are created when possible (previews can be disabled from the Settings page)</p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Save links quickly with our public API</h3>
+                  <p className="mt-2 text-base text-gray-800">Create your own mechanism to save links using our public API (instructions available on Settings page)</p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Archive, tag, and delete</h3>
+                  <p className="mt-2 text-base text-gray-800">Stay focused and organized by archiving, tagging, and deleting links</p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">List or grid view</h3>
+                  <p className="mt-2 text-base text-gray-800">Choose between viewing saved links in a list or grid (via Settings page)</p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Public collections</h3>
+                  <p className="mt-2 text-base text-gray-800">Keep your saved links private (default) or share them with the world by making your collection public (via Settings page)</p>
+                </div>
+              </div>
+            </div>
+          )
+        )}
       </div>
     </div>
   )
