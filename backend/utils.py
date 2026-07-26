@@ -2,7 +2,12 @@ import json
 import requests
 import metadata_parser
 from bs4 import BeautifulSoup
+from sqlalchemy import select
 from models import Link
+from database import SessionLocal
+from concurrent.futures import ThreadPoolExecutor
+
+metadata_executor = ThreadPoolExecutor(max_workers=3)
 
 def fetch_metadata_for_url(url: str) -> dict:
     """Fetches the title, description, and preview image metadata for a given URL."""
@@ -27,7 +32,7 @@ def fetch_metadata_for_url(url: str) -> dict:
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
             response = requests.get(url, headers=headers, timeout=5)
             response.raise_for_status()
-            soup = BeautifulSoup(response.text, 'html.parser')
+            soup = BeautifulSoup(response.text)
 
             if not result['title']:
                 title_tag = soup.find('title')
@@ -107,3 +112,33 @@ def format_link(link: Link) -> dict:
         "archived": link.archived,
         "created_at": link.created_at
     }
+
+def background_fetch_metadata(link_id: int):
+    db = SessionLocal()
+    try:
+        link = db.scalar(select(Link).filter(Link.id == link_id))
+        if not link:
+            return
+            
+        if link.image and link.title and link.description:
+            return
+            
+        meta = fetch_metadata_for_url(link.url)
+        
+        updated = False
+        if not link.image and meta.get('image'):
+            link.image = meta['image']
+            updated = True
+        if not link.title and meta.get('title'):
+            link.title = meta['title']
+            updated = True
+        if not link.description and meta.get('description'):
+            link.description = meta['description']
+            updated = True
+            
+        if updated:
+            db.commit()
+    except Exception as e:
+        print(f"Background metadata fetch failed for link {link_id}: {e}")
+    finally:
+        db.close()

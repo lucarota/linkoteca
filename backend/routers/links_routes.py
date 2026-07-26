@@ -11,10 +11,9 @@ from database import get_db
 from models import Collection, Link, Tag
 from schemas import LinkCreate, LinkResponse, PaginatedLinksResponse
 from auth import get_current_collection, get_api_or_current_collection, security, verify_collection_access
-from utils import fetch_metadata_for_url, format_link
+from utils import fetch_metadata_for_url, format_link, background_fetch_metadata, metadata_executor
 
 router = APIRouter(tags=["Links"])
-
 
 @router.post("/api/link", response_model=LinkResponse)
 def create_link(link: LinkCreate, db: Session = Depends(get_db),
@@ -27,25 +26,12 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db),
         db.refresh(existing_link)
         return format_link(existing_link)
 
-    final_image = link.image
-    final_title = link.title
-    final_description = link.description
-
-    if not final_image or not final_title or not final_description:
-        meta = fetch_metadata_for_url(link.url)
-        if not final_image and meta['image']:
-            final_image = meta['image']
-        if not final_title and meta['title']:
-            final_title = meta['title']
-        if not final_description and meta['description']:
-            final_description = meta['description']
-
     new_link = Link(
         collection_id=current_col.id,
         url=link.url,
-        title=final_title,
-        description=final_description,
-        image=final_image
+        title=link.title,
+        description=link.description,
+        image=link.image
     )
     if link.tags:
         seen_tags = set()
@@ -58,6 +44,9 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db),
     db.add(new_link)
     db.commit()
     db.refresh(new_link)
+
+    if not new_link.title or not new_link.description or not new_link.image:
+        metadata_executor.submit(background_fetch_metadata, new_link.id)
 
     return format_link(new_link)
 
