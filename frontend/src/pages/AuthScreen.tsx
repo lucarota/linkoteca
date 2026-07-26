@@ -98,7 +98,7 @@ function AuthScreen() {
                   <button 
                     onClick={e => handleAction(e, 'login')}
                     className="capitalize bg-black flex-1 w-full hover:bg-blue-600 text-white font-bold py-3 px-12 border text-lg hover:border-transparent rounded">
-                    login
+                    Login
                   </button>
                   <div className="md:flex items-center">
                     <div className="py-2 px-4">or</div>

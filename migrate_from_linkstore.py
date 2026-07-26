@@ -21,7 +21,7 @@ def main():
     linkoteca_token = sys.argv[2]
     
     linkstore_url = "https://linkstore.app/api/link"
-    linkoteca_url = "http://api.rotaliano.it/api/link"
+    linkoteca_url = "https://api.rotaliano.it/api/link"
     
     linkstore_headers = {
         "X-ACCESS-TOKEN": linkstore_token
