@@ -177,9 +177,10 @@ function SettingsScreen() {
                       <div className="mt-8 sm:grid sm:mt-5 sm:grid-cols-3 sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                         <dt className="text-sm leading-5 font-bold">Retrieve link API</dt>
                         <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                          <p>GET {API_URL}/link<br />GET {API_URL}/link?tags=tag1,tag2</p>
+                          <p className="mb-2 text-gray-600">Fetches a list of links in your collection. You can optionally filter the results by providing comma-separated tags, or retrieve archived links by setting the archived parameter to true.</p>
+                          <p>GET {API_URL}/links<br />GET {API_URL}/links?tags=tag1,tag2<br />GET {API_URL}/links?archived=true</p>
                           <div className="my-3">
-                            <code>curl -H "Authorization: Bearer {tokens.length > 0 ? tokens[0].token : 'YOUR_TOKEN'}" {API_URL}/link</code>
+                            <code>curl -H "Authorization: Bearer {tokens.length > 0 ? tokens[0].token : 'YOUR_TOKEN'}" "{API_URL}/links"</code>
                           </div>
                         </dd>
                       </div>
@@ -187,6 +188,7 @@ function SettingsScreen() {
                       <div className="mt-8 sm:grid sm:mt-5 sm:grid-cols-3 sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
                         <dt className="text-sm leading-5 font-bold">Create link API</dt>
                         <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+                          <p className="mb-2 text-gray-600">Creates a new link in your collection. You must provide the URL of the link in the JSON payload.</p>
                           <p>POST {API_URL}/link</p>
                           <div className="my-3">
                             <code>curl -d '&#123;"url": "https://my-new-url.com"&#125;' -H "Content-Type: application/json" -H "Authorization: Bearer {tokens.length > 0 ? tokens[0].token : 'YOUR_TOKEN'}" -X POST {API_URL}/link</code>
