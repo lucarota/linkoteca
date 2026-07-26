@@ -12,7 +12,7 @@ echo "Setting up Linkoteca backend in /opt/linkoteca/backend..."
 mkdir -p /opt/linkoteca/backend
 
 # Copy backend files (excluding venv, __pycache__, etc)
-rsync -a --exclude 'venv' --exclude '__pycache__' --exclude '.pytest_cache' ./ /opt/linkoteca/backend/
+rsync -a --exclude 'venv' --exclude '__pycache__' --exclude '.pytest_cache' --exclude 'tests' ./ /opt/linkoteca/backend/
 
 # Setup virtual environment
 echo "Setting up Python virtual environment..."
