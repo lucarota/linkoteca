@@ -1,14 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from sqlalchemy import select
-from fastapi.security import HTTPAuthorizationCredentials
 import jwt
-from typing import List
-
+from auth import verify_collection_access
 from database import get_db
-from models import Collection, Tag, Link
-from auth import security, verify_collection_access
-from config import JWT_SECRET
+from fastapi import APIRouter, Depends
+from models import Tag, Link
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from typing import List
 
 router = APIRouter(tags=["Collections"])
 
