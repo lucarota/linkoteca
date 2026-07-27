@@ -2,6 +2,8 @@
 
 This is a free reimplementation of linkstore.app built with Python and React.
 
+🚀 **Try it out now!** A ready-to-use installation is available at [linkoteca.it](https://linkoteca.it).
+
 ## Backend
 
 To run the backend:
