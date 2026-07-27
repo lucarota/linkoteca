@@ -154,7 +154,7 @@ function EditScreen() {
                                                             onChange={() => handleTagToggle(tag)}
                                                             className="custom-tag-checkbox h-4 w-4 rounded cursor-pointer"
                                                         />
-                                                        <span className="text-sm text-gray-700">{tag}</span>
+                                                        <span className="text-sm text-gray-700 ml-2">{tag}</span>
                                                     </label>
                                                 ))}
                                             </div>
