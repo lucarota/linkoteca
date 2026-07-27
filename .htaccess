@@ -1,0 +1,16 @@
+SetEnv PHP_VER 5_3
+SetEnv REGISTER_GLOBALS 0
+
+RewriteEngine On
+RewriteBase /
+
+# Do not rewrite the APIs
+RewriteRule ^api(/.*)?$ - [L]
+
+# Existing files and directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Everything else goes to the SPA
+RewriteRule ^ index.html [L]
