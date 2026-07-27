@@ -11,7 +11,7 @@ init_db()
 app = FastAPI(
     title="Linkoteca API",
     description="Backend API for Linkoteca, a self-hosted bookmarking tool to save your favorite links in collections. Organize, search and preview your web links with ease.",
-    version="1.0.0",
+    version="1.0.2",
     openapi_tags=[
         {"name": "Authentication", "description": "Operations for registration and login."},
         {"name": "Collections", "description": "Operations for fetching collection details."},

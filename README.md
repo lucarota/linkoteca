@@ -4,6 +4,10 @@ This is a free reimplementation of linkstore.app built with Python and React.
 
 🚀 **Try it out now!** A ready-to-use installation is available at [linkoteca.it](https://linkoteca.it).
 
+## Features
+
+- **Public Collections Directory**: Linkoteca includes a public directory where users can share their public collections. You have full control over this feature: you can decide whether to make your collection public and whether to list it in the public directory directly from your settings page.
+
 ## Backend
 
 To run the backend:
@@ -39,10 +43,24 @@ To run the frontend:
 
 ## Migration from Linkstore
 
-If you are migrating from Linkstore, you can use the `migrate_from_linkstore.py` script to automatically transfer all your saved links to Linkoteca.
+You can easily migrate all your saved links from Linkstore to Linkoteca.
 
-**How it works:**
-The script fetches your links from the Linkstore API and sends them to your Linkoteca instance. Please note that as a normal behavior of Linkstore, the links fetched from linkstore.app will be archived during this process.
+### Option 1: Via Web Interface (Recommended)
+
+You can start the import process directly from your Linkoteca settings page.
+
+1. Go to your collection **Settings** in Linkoteca.
+2. Look for the **Import from Linkstore.app** section.
+3. Enter your **Linkstore API Token**. You can find this token in the "Settings" page of your linkstore.app account.
+4. Click "Start Import". The migration will run seamlessly in the background.
+
+> **⚠️ Important Notes regarding the import:**
+> - **Active links only:** Only your currently active (unarchived) links will be imported.
+> - **Automatic archiving:** Please be aware that Linkstore automatically archives links as soon as they are retrieved during the import process. This is the standard behavior of Linkstore and it cannot be prevented.
+
+### Option 2: Via Standalone Script
+
+If you prefer the command line, you can use the `migrate_from_linkstore.py` script to automatically transfer all your saved links to Linkoteca.
 
 **Usage:**
 ```bash

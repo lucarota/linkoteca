@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2026-07-27
+
+### Added
+- **Public Collections Directory:** Users can now set their collections to public and optionally list them in the new public directory for sharing.
+- **Linkstore Import UI:** Introduced a seamless, background migration tool directly within the Settings page to import links from Linkstore.app using an API token.
+- **Archived Links Filter:** Added the ability to browse and filter archived links directly from the dashboard.
+- **Dashboard Statistics:** Integrated a new stats section in the dashboard showing the total count of active and archived links.
+
+### Changed
+- **UI & UX Enhancements:** 
+  - Updated the Authentication screen layout for a better user experience.
+  - Fixed dashboard loading states to prevent UI flickering.
+  - Improved the URL saving flow for faster and more reliable link additions.
+
 ## [1.0.1] - 2026-07-27
 
 ### Added
