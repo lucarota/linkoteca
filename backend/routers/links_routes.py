@@ -15,6 +15,7 @@ from utils import fetch_metadata_for_url, format_link, background_fetch_metadata
 
 router = APIRouter(tags=["Links"])
 
+
 @router.post("/api/link", response_model=LinkResponse)
 def create_link(link: LinkCreate, db: Session = Depends(get_db),
                 current_col: Collection = Depends(get_api_or_current_collection)):
@@ -103,6 +104,25 @@ def get_link(tags: Optional[str] = None, archived: Optional[bool] = False, db: S
         raise HTTPException(status_code=404, detail="No links found")
 
     return [format_link(item) for item in links]
+
+
+@router.get("/api/links/stats")
+def get_links_stats(db: Session = Depends(get_db), current_col: Collection = Depends(get_current_collection)):
+    """Returns the count of archived and unarchived links for the logged-in user."""
+    counts = db.execute(
+        select(Link.archived, func.count(Link.id))
+        .filter(Link.collection_id == current_col.id)
+        .group_by(Link.archived)
+    ).all()
+    
+    stats = {True: 0, False: 0}
+    for is_archived, count in counts:
+        stats[bool(is_archived)] = count
+        
+    return {
+        "archived": stats[True],
+        "unarchived": stats[False]
+    }
 
 
 @router.get("/api/links/{name}", response_model=PaginatedLinksResponse)
