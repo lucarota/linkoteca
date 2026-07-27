@@ -51,6 +51,12 @@ function Header({ collectionName, isOwner, search, setSearch, collectionDescript
     navigate('/')
   }
 
+    const handleLogin = () => {
+    localStorage.removeItem('linkoteca_token')
+    localStorage.removeItem('linkoteca_name')
+    navigate(`/?login=${collectionName}`)
+  }
+
   return (
     <header className="mx-auto text-xs rounded-t-none rounded-r-none border-b border-gray-200 z-0">
       <div className="flex bg-gray-50  items-center justify-center text-gray-900">
@@ -135,7 +141,7 @@ function Header({ collectionName, isOwner, search, setSearch, collectionDescript
         )}
 
         {!isOwner && (
-          <h2 className="hover:text-blue-600 py-0.5 mx-2 text-gray-600 cursor-pointer" onClick={() => navigate(`/?login=${collectionName}`)}>
+          <h2 className="hover:text-blue-600 py-0.5 mx-2 text-gray-600 cursor-pointer" onClick={handleLogin}>
             Login
           </h2>
         )}
