@@ -20,6 +20,9 @@ class TokenResponse(BaseModel):
     token: str
     created_at: datetime
 
+class LinkstoreImportRequest(BaseModel):
+    token: str
+
 class LinkCreate(BaseModel):
     url: str
     title: Optional[str] = None

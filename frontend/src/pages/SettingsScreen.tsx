@@ -1,244 +1,370 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { API_URL } from '../config';
+import {useState, useEffect} from 'react';
+import {useParams, useNavigate} from 'react-router-dom';
+import {API_URL} from '../config';
 import Header from '../components/Header';
 
 function SettingsScreen() {
-  const { collectionName } = useParams()
-  const navigate = useNavigate()
-  const [settings, setSettings] = useState({ is_public: false, show_in_public_list: false, description: '', display_images: true, display_mode: 'list', links_per_page: 20 })
-  const [tokens, setTokens] = useState<any[]>([])
-  const [newToken, setNewToken] = useState('')
-  const token = localStorage.getItem('linkoteca_token')
-
-  useEffect(() => {
-    if (!token || localStorage.getItem('linkoteca_name') !== collectionName) {
-      navigate('/')
-      return
-    }
-
-    const fetchSettings = async () => {
-      const [setRes, tokRes] = await Promise.all([
-        fetch(`${API_URL}/settings`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${API_URL}/settings/access_tokens`, { headers: { 'Authorization': `Bearer ${token}` } })
-      ])
-      if (setRes.ok) setSettings(await setRes.json())
-      if (tokRes.ok) setTokens(await tokRes.json())
-    }
-    fetchSettings()
-  }, [collectionName, token, navigate])
-
-  const updateSetting = async (key: string, value: any) => {
-    const newSettings = { ...settings, [key]: value }
-    setSettings(newSettings)
-    await fetch(`${API_URL}/settings`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify(newSettings)
+    const {collectionName} = useParams()
+    const navigate = useNavigate()
+    const [settings, setSettings] = useState({
+        is_public: false,
+        show_in_public_list: false,
+        description: '',
+        display_images: true,
+        display_mode: 'list',
+        links_per_page: 20
     })
-  }
+    const [tokens, setTokens] = useState<any[]>([])
+    const [newToken, setNewToken] = useState('')
+    const [linkstoreToken, setLinkstoreToken] = useState('')
+    const [importing, setImporting] = useState(false)
+    const [importMessage, setImportMessage] = useState('')
+    const token = localStorage.getItem('linkoteca_token')
 
-  const createToken = async () => {
-    // Delete old tokens to match original "Reset" behavior of exactly one token
-    for (let t of tokens) {
-      await fetch(`${API_URL}/settings/access_token/${t.id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-    }
-    
-    const res = await fetch(`${API_URL}/settings/access_token`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    
-    if (res.ok) {
-      const data = await res.json()
-      setNewToken(data.token)
-    }
-    
-    const tokRes = await fetch(`${API_URL}/settings/access_tokens`, { headers: { 'Authorization': `Bearer ${token}` } })
-    if (tokRes.ok) setTokens(await tokRes.json())
-  }
+    useEffect(() => {
+        if (!token || localStorage.getItem('linkoteca_name') !== collectionName) {
+            navigate('/')
+            return
+        }
 
-  return (
-    <>
-      <Header collectionName={collectionName} isOwner={true} search="" setSearch={() => {}} />
-      <div className="max-w-2xl mx-auto px-2 md:px-0">
-        <div>
-          <form onSubmit={e => e.preventDefault()}>
-            <div>
-              <div className="">
-                <div className="mt-8">
-                  <fieldset className="mt-6">
-                    <legend className="text-base font-medium text-gray-900">Collection description</legend>
-                    <div className="mt-4">
+        const fetchSettings = async () => {
+            const [setRes, tokRes] = await Promise.all([
+                fetch(`${API_URL}/settings`, {headers: {'Authorization': `Bearer ${token}`}}),
+                fetch(`${API_URL}/settings/access_tokens`, {headers: {'Authorization': `Bearer ${token}`}})
+            ])
+            if (setRes.ok) setSettings(await setRes.json())
+            if (tokRes.ok) setTokens(await tokRes.json())
+        }
+        fetchSettings()
+    }, [collectionName, token, navigate])
+
+    const updateSetting = async (key: string, value: any) => {
+        const newSettings = {...settings, [key]: value}
+        setSettings(newSettings)
+        await fetch(`${API_URL}/settings`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+            body: JSON.stringify(newSettings)
+        })
+    }
+
+    const createToken = async () => {
+        // Delete old tokens to match original "Reset" behavior of exactly one token
+        for (let t of tokens) {
+            await fetch(`${API_URL}/settings/access_token/${t.id}`, {
+                method: 'DELETE',
+                headers: {'Authorization': `Bearer ${token}`}
+            })
+        }
+
+        const res = await fetch(`${API_URL}/settings/access_token`, {
+            method: 'POST',
+            headers: {'Authorization': `Bearer ${token}`}
+        })
+
+        if (res.ok) {
+            const data = await res.json()
+            setNewToken(data.token)
+        }
+
+        const tokRes = await fetch(`${API_URL}/settings/access_tokens`, {headers: {'Authorization': `Bearer ${token}`}})
+        if (tokRes.ok) setTokens(await tokRes.json())
+    }
+
+    const startImport = async () => {
+        if (!linkstoreToken) return;
+        setImporting(true);
+        setImportMessage('');
+        try {
+            const res = await fetch(`${API_URL}/settings/import-linkstore`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                body: JSON.stringify({ token: linkstoreToken.trim() })
+            });
+            if (res.ok) {
+                setImportMessage('Import started successfully! Links will appear in the background.');
+                setLinkstoreToken('');
+            } else {
+                setImportMessage('Failed to start import.');
+            }
+        } catch (e) {
+            setImportMessage('Error starting import.');
+        }
+        setImporting(false);
+    }
+
+    return (
+        <>
+            <Header collectionName={collectionName} isOwner={true} search="" setSearch={() => {
+            }}/>
+            <div className="max-w-2xl mx-auto px-2 md:px-0">
+                <div>
+                    <form onSubmit={e => e.preventDefault()}>
+                        <div>
+                            <div className="">
+                                <div className="mt-8">
+                                    <fieldset className="mt-6">
+                                        <legend className="text-base font-medium text-gray-900">Collection description
+                                        </legend>
+                                        <div className="mt-4">
                       <textarea
-                        className="shadow-inner appearance-none block w-full text-gray-700 border text-sm border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 resize-y min-h-[100px]"
-                        placeholder="Write a short description about this collection (optional)"
-                        maxLength={200}
-                        value={settings.description || ''}
-                        onChange={e => updateSetting('description', e.target.value)}
+                          className="shadow-inner appearance-none block w-full text-gray-700 border text-sm border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 resize-y min-h-[100px]"
+                          placeholder="Write a short description about this collection (optional)"
+                          maxLength={200}
+                          value={settings.description || ''}
+                          onChange={e => updateSetting('description', e.target.value)}
                       />
-                      <p className="mt-2 text-xs text-gray-500">
-                        {200 - (settings.description?.length || 0)} characters remaining.
-                      </p>
-                    </div>
-                  </fieldset>
-                </div>
-                <div className="mt-6">
-                  <fieldset className="mt-6">
-                    <legend className="text-base font-medium text-gray-900">Collection visibility</legend>
-                    <div className="mt-4">
-                      <div className="flex items-center">
-                        <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={!settings.is_public} onChange={() => updateSetting('is_public', false)} />
-                        <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">Private</label>
-                      </div>
-                      <div className="mt-4 flex items-center">
-                        <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={settings.is_public} onChange={() => updateSetting('is_public', true)} />
-                        <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">Public</label>
-                      </div>
-                    </div>
-                  </fieldset>
-                </div>
+                                            <p className="mt-2 text-xs text-gray-500">
+                                                {200 - (settings.description?.length || 0)} characters remaining.
+                                            </p>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div className="mt-6">
+                                    <fieldset className="mt-6">
+                                        <legend className="text-base font-medium text-gray-900">Collection visibility
+                                        </legend>
+                                        <div className="mt-4">
+                                            <div className="flex items-center">
+                                                <input
+                                                    className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                                                    type="radio" checked={!settings.is_public}
+                                                    onChange={() => updateSetting('is_public', false)}/>
+                                                <label
+                                                    className="ml-3 block text-sm leading-5 font-medium text-gray-700">Private</label>
+                                            </div>
+                                            <div className="mt-4 flex items-center">
+                                                <input
+                                                    className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                                                    type="radio" checked={settings.is_public}
+                                                    onChange={() => updateSetting('is_public', true)}/>
+                                                <label
+                                                    className="ml-3 block text-sm leading-5 font-medium text-gray-700">Public</label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
 
 
-                {settings.is_public && (
-                  <div className="mt-8">
-                    <fieldset className="mt-6">
-                      <legend className="text-base font-medium text-gray-900">Public directory</legend>
-                      <div className="mt-4">
-                        <div className="flex items-center">
-                          <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={settings.show_in_public_list} onChange={() => updateSetting('show_in_public_list', true)} />
-                          <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">List in public collections page</label>
+                                {settings.is_public && (
+                                    <div className="mt-8">
+                                        <fieldset className="mt-6">
+                                            <legend className="text-base font-medium text-gray-900">Public directory
+                                            </legend>
+                                            <div className="mt-4">
+                                                <div className="flex items-center">
+                                                    <input
+                                                        className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                                                        type="radio" checked={settings.show_in_public_list}
+                                                        onChange={() => updateSetting('show_in_public_list', true)}/>
+                                                    <label
+                                                        className="ml-3 block text-sm leading-5 font-medium text-gray-700">List
+                                                        in public collections page</label>
+                                                </div>
+                                                <div className="mt-4 flex items-center">
+                                                    <input
+                                                        className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                                                        type="radio" checked={!settings.show_in_public_list}
+                                                        onChange={() => updateSetting('show_in_public_list', false)}/>
+                                                    <label
+                                                        className="ml-3 block text-sm leading-5 font-medium text-gray-700">Hide
+                                                        from public collections</label>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                )}
+
+                                <div className="mt-8">
+                                    <fieldset className="mt-6">
+                                        <legend className="text-base font-medium text-gray-900">Rich previews</legend>
+                                        <div className="mt-4">
+                                            <div className="flex items-center">
+                                                <input
+                                                    className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                                                    type="radio" checked={settings.display_images}
+                                                    onChange={() => updateSetting('display_images', true)}/>
+                                                <label
+                                                    className="ml-3 block text-sm leading-5 font-medium text-gray-700">Enabled</label>
+                                            </div>
+                                            <div className="mt-4 flex items-center">
+                                                <input
+                                                    className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                                                    type="radio" checked={!settings.display_images}
+                                                    onChange={() => updateSetting('display_images', false)}/>
+                                                <label
+                                                    className="ml-3 block text-sm leading-5 font-medium text-gray-700">Disabled</label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+
+                                <div className="mt-8">
+                                    <fieldset className="mt-6">
+                                        <legend className="text-base font-medium text-gray-900">Display mode</legend>
+                                        <div className="mt-4">
+                                            <div className="flex items-center">
+                                                <input
+                                                    className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                                                    type="radio" checked={settings.display_mode === 'list'}
+                                                    onChange={() => updateSetting('display_mode', 'list')}/>
+                                                <label
+                                                    className="ml-3 block text-sm leading-5 font-medium text-gray-700">List</label>
+                                            </div>
+                                            <div className="mt-4 flex items-center">
+                                                <input
+                                                    className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                                                    type="radio" checked={settings.display_mode === 'grid'}
+                                                    onChange={() => updateSetting('display_mode', 'grid')}/>
+                                                <label
+                                                    className="ml-3 block text-sm leading-5 font-medium text-gray-700">Grid</label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+
+                                <div className="mt-8">
+                                    <fieldset className="mt-6">
+                                        <legend className="text-base font-medium text-gray-900">Links per page</legend>
+                                        <div className="mt-4">
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                max="200"
+                                                className="shadow-inner appearance-none block text-gray-700 border text-sm border-gray-300 rounded p-2 focus:outline-none"
+                                                value={settings.links_per_page || 20}
+                                                onChange={e => updateSetting('links_per_page', parseInt(e.target.value) || 20)}
+                                            />
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
                         </div>
-                        <div className="mt-4 flex items-center">
-                          <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={!settings.show_in_public_list} onChange={() => updateSetting('show_in_public_list', false)} />
-                          <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">Hide from public collections</label>
+                    </form>
+                </div>
+
+                <div className="mt-10">
+                    <div className="rounded-md bg-gray-50 px-4 py-5 sm:p-6 border border-gray-200">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">Import from Linkstore.app</h3>
+                        <div className="mt-2 text-sm leading-5 text-gray-500">
+                            <p>Migrate all your links from Linkstore.app to Linkoteca. You can find your Linkstore API
+                                token in the settings page of Linkstore.app.</p>
+                            <p className="mt-2 text-xs font-semibold text-yellow-600 bg-yellow-50 p-2 rounded border border-yellow-200">
+                                Note: Only active links will be imported. Please be aware that Linkstore automatically archives links as soon as they are retrieved during the import process.
+                            </p>
                         </div>
-                      </div>
-                    </fieldset>
-                  </div>
-                )}
-
-                <div className="mt-8">
-                  <fieldset className="mt-6">
-                    <legend className="text-base font-medium text-gray-900">Rich previews</legend>
-                    <div className="mt-4">
-                      <div className="flex items-center">
-                        <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={settings.display_images} onChange={() => updateSetting('display_images', true)} />
-                        <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">Enabled</label>
-                      </div>
-                      <div className="mt-4 flex items-center">
-                        <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={!settings.display_images} onChange={() => updateSetting('display_images', false)} />
-                        <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">Disabled</label>
-                      </div>
+                        <div className="mt-5 sm:flex sm:items-center">
+                            <div className="max-w-xs w-full mr-2">
+                                <input
+                                    type="text"
+                                    className="shadow-sm focus:ring-blue-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
+                                    placeholder="Linkstore API Token"
+                                    value={linkstoreToken}
+                                    onChange={(e) => setLinkstoreToken(e.target.value)}
+                                    disabled={importing}
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:shadow-outline-blue transition ease-in-out duration-150 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                onClick={startImport}
+                                disabled={importing || !linkstoreToken}
+                            >
+                                {importing ? 'Starting...' : 'Start Import'}
+                            </button>
+                        </div>
+                        {importMessage && (
+                            <p className={`mt-2 text-sm ${importMessage.includes('successfully') ? 'text-green-600' : 'text-red-600'}`}>
+                                {importMessage}
+                            </p>
+                        )}
                     </div>
-                  </fieldset>
                 </div>
 
-                <div className="mt-8">
-                  <fieldset className="mt-6">
-                    <legend className="text-base font-medium text-gray-900">Display mode</legend>
-                    <div className="mt-4">
-                      <div className="flex items-center">
-                        <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={settings.display_mode === 'list'} onChange={() => updateSetting('display_mode', 'list')} />
-                        <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">List</label>
-                      </div>
-                      <div className="mt-4 flex items-center">
-                        <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={settings.display_mode === 'grid'} onChange={() => updateSetting('display_mode', 'grid')} />
-                        <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">Grid</label>
-                      </div>
-                    </div>
-                  </fieldset>
-                </div>
-
-                <div className="mt-8">
-                  <fieldset className="mt-6">
-                    <legend className="text-base font-medium text-gray-900">Links per page</legend>
-                    <div className="mt-4">
-                      <input 
-                        type="number" 
-                        min="1" 
-                        max="200" 
-                        className="shadow-inner appearance-none block text-gray-700 border text-sm border-gray-300 rounded p-2 focus:outline-none" 
-                        value={settings.links_per_page || 20} 
-                        onChange={e => updateSetting('links_per_page', parseInt(e.target.value) || 20)}
-                      />
-                    </div>
-                  </fieldset>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <div className="mt-10">
-          <div className="rounded-md bg-gray-50 px-2 py-5 flex items-start justify-between">
-            <div className="sm:flex sm:items-start">
-              <div className="mt-3 sm:mt-0">
-                <div className="leading-5 font-bold text-gray-900">API</div>
-                <div className="mt-1 leading-5 text-gray-700">
-                  <div className="mt-5 border-t border-gray-200 pt-5">
-                    <dl>
-                      <div className="sm:grid sm:grid-cols-3 sm:gap-4">
-                        <dt className="text-sm leading-5 font-bold">Access token</dt>
-                        <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                          <div className="mt-4 sm:mt-0">
-                            {newToken ? (
-                              <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                                <p className="text-yellow-800 text-sm font-bold mb-2">Save this token now. You will not be able to see it again!</p>
-                                <p className="cursor-pointer select-all text-yellow-900 font-mono break-all">{newToken}</p>
-                              </div>
-                            ) : tokens.length > 0 ? (
-                              <p className="pb-5 cursor-pointer select-all text-red-500 font-bold pr-4 break-all">
-                                {tokens[0].token}
-                              </p>
-                            ) : (
-                              <p className="pb-5 cursor-pointer select-all text-gray-500 font-bold pr-4 break-all">
-                                No token generated.
-                              </p>
-                            )}
-                            <span className="inline-flex rounded-md shadow-sm">
-                              <button onClick={createToken} className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                <div className="mt-10">
+                    <div className="rounded-md bg-gray-50 px-2 py-5 flex items-start justify-between">
+                        <div className="sm:flex sm:items-start">
+                            <div className="mt-3 sm:mt-0">
+                                <div className="leading-5 font-bold text-gray-900">API</div>
+                                <div className="mt-1 leading-5 text-gray-700">
+                                    <div className="mt-5 border-t border-gray-200 pt-5">
+                                        <dl>
+                                            <div className="sm:grid sm:grid-cols-3 sm:gap-4">
+                                                <dt className="text-sm leading-5 font-bold">Access token</dt>
+                                                <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+                                                    <div className="mt-4 sm:mt-0">
+                                                        {newToken ? (
+                                                            <div
+                                                                className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                                                                <p className="text-yellow-800 text-sm font-bold mb-2">Save
+                                                                    this token now. You will not be able to see it
+                                                                    again!</p>
+                                                                <p className="cursor-pointer select-all text-yellow-900 font-mono break-all">{newToken}</p>
+                                                            </div>
+                                                        ) : tokens.length > 0 ? (
+                                                            <p className="pb-5 cursor-pointer select-all text-red-500 font-bold pr-4 break-all">
+                                                                {tokens[0].token}
+                                                            </p>
+                                                        ) : (
+                                                            <p className="pb-5 cursor-pointer select-all text-gray-500 font-bold pr-4 break-all">
+                                                                No token generated.
+                                                            </p>
+                                                        )}
+                                                        <span className="inline-flex rounded-md shadow-sm">
+                              <button onClick={createToken}
+                                      className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                 {tokens.length > 0 ? 'Generate New API Token' : 'Create API Token'}
                               </button>
                             </span>
-                          </div>
-                        </dd>
-                      </div>
+                                                    </div>
+                                                </dd>
+                                            </div>
 
-                      <div className="mt-8 sm:grid sm:mt-5 sm:grid-cols-3 sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
-                        <dt className="text-sm leading-5 font-bold">Retrieve link API</dt>
-                        <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                          <p className="mb-2 text-gray-600">Fetches a list of links in your collection. You can optionally filter the results by providing comma-separated tags, or retrieve archived links by setting the archived parameter to true.</p>
-                          <p>GET {API_URL}/links<br />GET {API_URL}/links?tags=tag1,tag2<br />GET {API_URL}/links?archived=true</p>
-                          <div className="my-3">
-                            <code>curl -H "Authorization: Bearer {tokens.length > 0 ? tokens[0].token : 'YOUR_TOKEN'}" "{API_URL}/links"</code>
-                          </div>
-                        </dd>
-                      </div>
+                                            <div
+                                                className="mt-8 sm:grid sm:mt-5 sm:grid-cols-3 sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
+                                                <dt className="text-sm leading-5 font-bold">Retrieve link API</dt>
+                                                <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+                                                    <p className="mb-2 text-gray-600">Fetches a list of links in your
+                                                        collection. You can optionally filter the results by providing
+                                                        comma-separated tags, or retrieve archived links by setting the
+                                                        archived parameter to true.</p>
+                                                    <p>GET {API_URL}/links<br/>GET {API_URL}/links?tags=tag1,tag2<br/>GET {API_URL}/links?archived=true
+                                                    </p>
+                                                    <div className="my-3">
+                                                        <code>curl -H "Authorization:
+                                                            Bearer {tokens.length > 0 ? tokens[0].token : 'YOUR_TOKEN'}"
+                                                            "{API_URL}/links"</code>
+                                                    </div>
+                                                </dd>
+                                            </div>
 
-                      <div className="mt-8 sm:grid sm:mt-5 sm:grid-cols-3 sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
-                        <dt className="text-sm leading-5 font-bold">Create link API</dt>
-                        <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                          <p className="mb-2 text-gray-600">Creates a new link in your collection. You must provide the URL of the link in the JSON payload.</p>
-                          <p>POST {API_URL}/link</p>
-                          <div className="my-3">
-                            <code>curl -d '&#123;"url": "https://my-new-url.com"&#125;' -H "Content-Type: application/json" -H "Authorization: Bearer {tokens.length > 0 ? tokens[0].token : 'YOUR_TOKEN'}" -X POST {API_URL}/link</code>
-                          </div>
-                        </dd>
-                      </div>
-                    </dl>
-                  </div>
+                                            <div
+                                                className="mt-8 sm:grid sm:mt-5 sm:grid-cols-3 sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
+                                                <dt className="text-sm leading-5 font-bold">Create link API</dt>
+                                                <dd className="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+                                                    <p className="mb-2 text-gray-600">Creates a new link in your
+                                                        collection. You must provide the URL of the link in the JSON
+                                                        payload.</p>
+                                                    <p>POST {API_URL}/link</p>
+                                                    <div className="my-3">
+                                                        <code>curl -d '&#123;"url": "https://my-new-url.com"&#125;' -H
+                                                            "Content-Type: application/json" -H "Authorization:
+                                                            Bearer {tokens.length > 0 ? tokens[0].token : 'YOUR_TOKEN'}"
+                                                            -X POST {API_URL}/link</code>
+                                                    </div>
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-      </div>
-    </>
-  )
+            </div>
+        </>
+    )
 }
+
 export default SettingsScreen;

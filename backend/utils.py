@@ -2,6 +2,8 @@ import json
 import metadata_parser
 import requests
 from bs4 import BeautifulSoup
+import time
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from sqlalchemy import select
 
@@ -152,5 +154,48 @@ def background_fetch_metadata(link_id: int):
             db.commit()
     except Exception as e:
         print(f"Background metadata fetch failed for link {link_id}: {e}")
+    finally:
+        db.close()
+
+def background_import_linkstore(linkstore_token: str, collection_id: int):
+    db = SessionLocal()
+    try:
+        linkstore_url = "https://linkstore.app/api/link"
+        linkstore_headers = {"X-ACCESS-TOKEN": linkstore_token.strip()}
+        previous_url = None
+        count = 0
+        
+        while True:
+            try:
+                response = requests.get(linkstore_url, headers=linkstore_headers)
+                response.raise_for_status()
+                
+                current_url = response.text.strip().strip('"').strip("'")
+                
+                if not current_url or current_url == previous_url:
+                    break
+                    
+                existing_link = db.scalar(select(Link).filter(Link.collection_id == collection_id, Link.url == current_url))
+                if existing_link:
+                    existing_link.created_at = datetime.utcnow()
+                    db.commit()
+                else:
+                    new_link = Link(
+                        collection_id=collection_id,
+                        url=current_url
+                    )
+                    db.add(new_link)
+                    db.commit()
+                    db.refresh(new_link)
+                    metadata_executor.submit(background_fetch_metadata, new_link.id)
+                
+                previous_url = current_url
+                count += 1
+                time.sleep(0.5)
+            except requests.exceptions.RequestException as e:
+                print(f"Network ERROR during linkstore import request: {e}")
+                break
+    except Exception as e:
+        print(f"Background Linkstore import failed for collection {collection_id}: {e}")
     finally:
         db.close()

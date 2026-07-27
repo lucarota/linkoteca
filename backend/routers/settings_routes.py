@@ -1,9 +1,10 @@
 import secrets
 from auth import get_current_collection
 from database import get_db
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from models import Collection, AccessToken
-from schemas import CollectionSettings, TokenResponse
+from schemas import CollectionSettings, TokenResponse, LinkstoreImportRequest
+from utils import background_import_linkstore
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from typing import List
@@ -76,3 +77,9 @@ def delete_access_token(token_id: int, db: Session = Depends(get_db), current_co
         db.delete(token)
         db.commit()
     return {"status": "success"}
+
+@router.post("/api/settings/import-linkstore")
+def import_linkstore(request: LinkstoreImportRequest, background_tasks: BackgroundTasks, current_col: Collection = Depends(get_current_collection)):
+    """Starts a background task to import links from Linkstore."""
+    background_tasks.add_task(background_import_linkstore, request.token, current_col.id)
+    return {"status": "success", "message": "Import started in background"}
