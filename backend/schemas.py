@@ -30,6 +30,7 @@ class LinkCreate(BaseModel):
 class LinkResponse(BaseModel):
     id: int
     url: str
+    favicon: str
     title: Optional[str]
     description: Optional[str]
     tags: Optional[str]

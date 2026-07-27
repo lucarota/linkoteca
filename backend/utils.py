@@ -12,7 +12,7 @@ metadata_executor = ThreadPoolExecutor(max_workers=3)
 
 def fetch_metadata_for_url(url: str) -> dict:
     """Fetches the title, description, and preview image metadata for a given URL."""
-    result = {'title': None, 'description': None, 'image': None}
+    result = {'title': None, 'description': None, 'image': None, 'favicon': None}
     try:
         page = metadata_parser.MetadataParser(url=url, search_head_only=False)
         img = page.get_metadata_link('image')
@@ -33,7 +33,7 @@ def fetch_metadata_for_url(url: str) -> dict:
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
             response = requests.get(url, headers=headers, timeout=5)
             response.raise_for_status()
-            soup = BeautifulSoup(response.text)
+            soup = BeautifulSoup(response.text, features="lxml")
 
             if not result['title']:
                 title_tag = soup.find('title')
@@ -96,6 +96,13 @@ def fetch_metadata_for_url(url: str) -> dict:
                             break
                     except Exception:
                         continue
+
+            if not result['favicon']:
+                icon_link = soup.find("link", rel="shortcut icon")
+                if icon_link is None:
+                    icon_link = soup.find("link", rel="icon")
+                if icon_link:
+                    result['favicon'] = icon_link.get("href", "")
         except Exception:
             pass
 
@@ -106,6 +113,7 @@ def format_link(link: Link) -> dict:
     return {
         "id": link.id,
         "url": link.url,
+        "favicon": link.favicon or "",
         "title": link.title,
         "description": link.description,
         "tags": ", ".join([tag.name for tag in link.tags]) if link.tags else "",
@@ -136,7 +144,10 @@ def background_fetch_metadata(link_id: int):
         if not link.description and meta.get('description'):
             link.description = meta['description']
             updated = True
-            
+        if not link.favicon and meta.get('favicon'):
+            link.favicon = meta['favicon']
+            updated = True
+
         if updated:
             db.commit()
     except Exception as e:

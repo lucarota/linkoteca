@@ -10,7 +10,7 @@ from schemas import LinkCreate, LinkResponse, PaginatedLinksResponse
 from sqlalchemy import or_, select, func
 from sqlalchemy.orm import Session
 from typing import Optional
-from utils import fetch_metadata_for_url, format_link, background_fetch_metadata, metadata_executor
+from utils import format_link, background_fetch_metadata, metadata_executor
 
 router = APIRouter(tags=["Links"])
 

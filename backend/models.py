@@ -41,6 +41,7 @@ class Link(Base):
     id = Column(Integer, primary_key=True, index=True)
     collection_id = Column(Integer, ForeignKey("collection.id"), nullable=False)
     url = Column(String, nullable=False)
+    favicon = Column(String, nullable=True)
     title = Column(String, nullable=True)
     description = Column(String, nullable=True)
     image = Column(String, nullable=True)
