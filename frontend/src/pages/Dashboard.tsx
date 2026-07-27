@@ -48,7 +48,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
   }, [search, archived, tagsParam])
 
   useEffect(() => {
-    if (addedLink) {
+    if (addedLink && !archived) {
       setLinks(prev => {
         const filtered = prev.filter(l => l.id !== addedLink.id);
         return [addedLink, ...filtered];
