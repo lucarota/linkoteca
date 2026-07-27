@@ -14,7 +14,8 @@ router = APIRouter(tags=["Authentication"])
 @router.post("/api/register")
 def register(col: CollectionCreate, db: Session = Depends(get_db)):
     """Registers a new collection and returns a JWT token."""
-    if col.name.lower() in ["directory", "api", "settings", "admin", "static"]:
+    col.name = col.name.lower()
+    if col.name in ["directory", "api", "settings", "admin", "static"]:
         raise HTTPException(status_code=400, detail="This collection name is reserved")
         
     db_col = db.scalar(select(Collection).filter(Collection.name == col.name))
@@ -33,6 +34,7 @@ def register(col: CollectionCreate, db: Session = Depends(get_db)):
 @router.post("/api/login")
 def login(col: CollectionCreate, db: Session = Depends(get_db)):
     """Authenticates a collection login and returns a JWT token."""
+    col.name = col.name.lower()
     db_col = db.scalar(select(Collection).filter(Collection.name == col.name))
     if not db_col or not verify_password(col.password, db_col.password_hash):
         raise HTTPException(status_code=400, detail="Incorrect name or password")

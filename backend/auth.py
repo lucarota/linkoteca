@@ -94,6 +94,7 @@ def verify_collection_access(
     Verifies if the current user has access to a specific collection.
     Checks visibility and ownership based on the provided credentials.
     """
+    name = name.lower()
     col = db.scalar(select(Collection).filter(Collection.name == name))
     if not col:
         raise HTTPException(status_code=404, detail="Collection not found")

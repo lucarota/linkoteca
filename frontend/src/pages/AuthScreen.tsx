@@ -95,7 +95,7 @@ function AuthScreen() {
                                         placeholder="Enter collection name"
                                         type="text"
                                         value={name}
-                                        onChange={e => setName(e.target.value)}
+                                        onChange={e => setName(e.target.value.toLowerCase())}
                                         required
                                     />
                                 </div>
