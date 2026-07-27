@@ -62,6 +62,8 @@ python migrate_from_linkstore.py your_linkstore_token your_linkoteca_token
 
 The SVG icons used in this project are provided by [Heroicons](https://heroicons.com/).
 
+This project was inspired by [linkstore.app](https://linkstore.app/).
+
 ## Version History
 See [CHANGELOG.md](https://github.com/lucarota/linkoteca/blob/master/CHANGELOG.md).
 
