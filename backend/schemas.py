@@ -1,6 +1,7 @@
+from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional, List, Any
-from datetime import datetime
+
 
 class CollectionCreate(BaseModel):
     name: str

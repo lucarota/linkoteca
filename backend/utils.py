@@ -1,11 +1,12 @@
 import json
-import requests
 import metadata_parser
+import requests
 from bs4 import BeautifulSoup
-from sqlalchemy import select
-from models import Link
-from database import SessionLocal
 from concurrent.futures import ThreadPoolExecutor
+from sqlalchemy import select
+
+from database import SessionLocal
+from models import Link
 
 metadata_executor = ThreadPoolExecutor(max_workers=3)
 

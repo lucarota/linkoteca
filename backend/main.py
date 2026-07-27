@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from database import init_db
 from config import frontend_origins
+from database import init_db
 from routers import auth_routes, collections_routes, settings_routes, links_routes, health_routes
 
 init_db()

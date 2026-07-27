@@ -1,14 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from sqlalchemy import select, func
-from datetime import datetime, timedelta
 import jwt
-
-from schemas import CollectionCreate
-from models import Collection, Link
-from database import get_db
-from config import JWT_SECRET
 from auth import get_password_hash, verify_password
+from config import JWT_SECRET
+from database import get_db
+from datetime import datetime, timedelta
+from fastapi import APIRouter, Depends, HTTPException
+from models import Collection, Link
+from schemas import CollectionCreate
+from sqlalchemy import select, func
+from sqlalchemy.orm import Session
 
 router = APIRouter(tags=["Authentication"])
 

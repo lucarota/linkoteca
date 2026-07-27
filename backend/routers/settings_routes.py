@@ -1,13 +1,12 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from sqlalchemy import select
 import secrets
-from typing import List
-
-from schemas import CollectionSettings, TokenResponse
-from models import Collection, AccessToken
-from database import get_db
 from auth import get_current_collection
+from database import get_db
+from fastapi import APIRouter, Depends
+from models import Collection, AccessToken
+from schemas import CollectionSettings, TokenResponse
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from typing import List
 
 router = APIRouter(tags=["Settings"])
 

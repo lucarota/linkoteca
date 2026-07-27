@@ -3,10 +3,10 @@ from auth import verify_collection_access
 from database import get_db
 from fastapi import APIRouter, Depends
 from models import Tag, Link, Collection
+from schemas import PaginatedCollectionsResponse, PublicCollectionResponse
 from sqlalchemy import select, func, or_
 from sqlalchemy.orm import Session
 from typing import List
-from schemas import PaginatedCollectionsResponse, PublicCollectionResponse
 
 router = APIRouter(tags=["Collections"])
 
