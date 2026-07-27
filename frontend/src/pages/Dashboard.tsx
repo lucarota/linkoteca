@@ -232,24 +232,24 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
             <div className="py-10">
               <div className="max-w-3xl mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Get started saving links</h3>
-                  <p className="mt-2 text-base text-gray-800">Use the input at the top of the page to save a link. Rich previews are created when possible (previews can be disabled from the Settings page)</p>
+                  <h3 className="text-lg font-bold text-gray-900">Save Your First Link</h3>
+                  <p className="mt-2 text-base text-gray-800">Use the input at the top of the page to save a link. Rich previews are generated automatically whenever available.</p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Save links quickly with our public API</h3>
-                  <p className="mt-2 text-base text-gray-800">Create your own mechanism to save links using our public API (instructions available on Settings page)</p>
+                  <h3 className="text-lg font-bold text-gray-900">Save Links with the API</h3>
+                  <p className="mt-2 text-base text-gray-800">Build your own integrations and save links programmatically using the public API.</p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Archive, tag, and delete</h3>
-                  <p className="mt-2 text-base text-gray-800">Stay focused and organized by archiving, tagging, and deleting links</p>
+                  <h3 className="text-lg font-bold text-gray-900">Archive, Tag & Delete</h3>
+                  <p className="mt-2 text-base text-gray-800">Keep your collection organized by archiving, tagging, and deleting links.</p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">List or grid view</h3>
-                  <p className="mt-2 text-base text-gray-800">Choose between viewing saved links in a list or grid (via Settings page)</p>
+                  <h3 className="text-lg font-bold text-gray-900">List or Grid View</h3>
+                  <p className="mt-2 text-base text-gray-800">Choose the layout that works best for you. Switch between list and grid view anytime.</p>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">Public collections</h3>
-                  <p className="mt-2 text-base text-gray-800">Keep your saved links private (default) or share them with the world by making your collection public (via Settings page)</p>
+                  <h3 className="text-lg font-bold text-gray-900">Public Collections</h3>
+                  <p className="mt-2 text-base text-gray-800">Your collections are private by default. Share them with anyone by making a collection public.</p>
                 </div>
               </div>
             </div>
