@@ -65,6 +65,11 @@ function AuthScreen() {
                 <p className="my-4 max-w-3xl mx-auto text-center text-xl text-gray-500">
                     Never lose a great link again. Save your favorite content from any browser, on any device.
                 </p>
+                <div className="flex justify-center mt-4">
+                    <button onClick={() => navigate('/directory')} className="cursor-pointer text-black hover:text-blue-800 font-medium">
+                        Explore Public Directory →
+                    </button>
+                </div>
             </header>
 
             <main>

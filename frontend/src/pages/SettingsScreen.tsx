@@ -6,7 +6,7 @@ import Header from '../components/Header';
 function SettingsScreen() {
   const { collectionName } = useParams()
   const navigate = useNavigate()
-  const [settings, setSettings] = useState({ is_public: false, display_images: true, display_mode: 'list', links_per_page: 20 })
+  const [settings, setSettings] = useState({ is_public: false, show_in_public_list: false, description: '', display_images: true, display_mode: 'list', links_per_page: 20 })
   const [tokens, setTokens] = useState<any[]>([])
   const [newToken, setNewToken] = useState('')
   const token = localStorage.getItem('linkoteca_token')
@@ -69,6 +69,23 @@ function SettingsScreen() {
           <form onSubmit={e => e.preventDefault()}>
             <div>
               <div className="">
+                <div className="mt-8">
+                  <fieldset className="mt-6">
+                    <legend className="text-base font-medium text-gray-900">Collection description</legend>
+                    <div className="mt-4">
+                      <textarea
+                        className="shadow-inner appearance-none block w-full text-gray-700 border text-sm border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 resize-y min-h-[100px]"
+                        placeholder="Write a short description about this collection (optional)"
+                        maxLength={200}
+                        value={settings.description || ''}
+                        onChange={e => updateSetting('description', e.target.value)}
+                      />
+                      <p className="mt-2 text-xs text-gray-500">
+                        {200 - (settings.description?.length || 0)} characters remaining.
+                      </p>
+                    </div>
+                  </fieldset>
+                </div>
                 <div className="mt-6">
                   <fieldset className="mt-6">
                     <legend className="text-base font-medium text-gray-900">Collection visibility</legend>
@@ -84,6 +101,25 @@ function SettingsScreen() {
                     </div>
                   </fieldset>
                 </div>
+
+
+                {settings.is_public && (
+                  <div className="mt-8">
+                    <fieldset className="mt-6">
+                      <legend className="text-base font-medium text-gray-900">Public directory</legend>
+                      <div className="mt-4">
+                        <div className="flex items-center">
+                          <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={settings.show_in_public_list} onChange={() => updateSetting('show_in_public_list', true)} />
+                          <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">List in public collections page</label>
+                        </div>
+                        <div className="mt-4 flex items-center">
+                          <input className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out" type="radio" checked={!settings.show_in_public_list} onChange={() => updateSetting('show_in_public_list', false)} />
+                          <label className="ml-3 block text-sm leading-5 font-medium text-gray-700">Hide from public collections</label>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </div>
+                )}
 
                 <div className="mt-8">
                   <fieldset className="mt-6">

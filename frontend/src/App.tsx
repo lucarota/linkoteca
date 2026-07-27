@@ -3,6 +3,7 @@ import AuthScreen from './pages/AuthScreen';
 import DashboardWrapper from './pages/DashboardWrapper';
 import EditScreen from './pages/EditScreen';
 import SettingsScreen from './pages/SettingsScreen';
+import PublicDirectoryScreen from './pages/PublicDirectoryScreen';
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
       `}</style>
       <Routes>
         <Route path="/" element={<AuthScreen />} />
+        <Route path="/directory" element={<PublicDirectoryScreen />} />
         <Route path="/:collectionName" element={<DashboardWrapper />} />
         <Route path="/:collectionName/:linkId/edit" element={<EditScreen />} />
         <Route path="/:collectionName/settings" element={<SettingsScreen />} />

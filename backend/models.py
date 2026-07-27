@@ -10,6 +10,8 @@ class Collection(Base):
     name = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
     is_public = Column(Boolean, default=False)
+    show_in_public_list = Column(Boolean, default=False)
+    description = Column(String, nullable=True)
     display_images = Column(Boolean, default=True)
     display_mode = Column(String, default="list")
     links_per_page = Column(Integer, default=20)

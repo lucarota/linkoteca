@@ -8,6 +8,8 @@ class CollectionCreate(BaseModel):
 
 class CollectionSettings(BaseModel):
     is_public: bool
+    show_in_public_list: bool = False
+    description: Optional[str] = None
     display_images: bool
     display_mode: str
     links_per_page: Any = 20
@@ -36,6 +38,16 @@ class LinkResponse(BaseModel):
 
 class PaginatedLinksResponse(BaseModel):
     items: List[LinkResponse]
+    total: int
+    page: int
+    pages: int
+
+class PublicCollectionResponse(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+class PaginatedCollectionsResponse(BaseModel):
+    items: List[PublicCollectionResponse]
     total: int
     page: int
     pages: int

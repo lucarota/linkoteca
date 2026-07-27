@@ -16,6 +16,8 @@ def get_settings(current_col: Collection = Depends(get_current_collection)):
     """Retrieves the current settings for the authenticated collection."""
     return {
         "is_public": current_col.is_public,
+        "show_in_public_list": current_col.show_in_public_list,
+        "description": current_col.description,
         "display_images": current_col.display_images,
         "display_mode": current_col.display_mode,
         "name": current_col.name,
@@ -26,6 +28,13 @@ def get_settings(current_col: Collection = Depends(get_current_collection)):
 def update_settings(settings: CollectionSettings, db: Session = Depends(get_db), current_col: Collection = Depends(get_current_collection)):
     """Updates the settings for the authenticated collection."""
     current_col.is_public = settings.is_public
+    current_col.show_in_public_list = settings.show_in_public_list
+    
+    if settings.description:
+        current_col.description = settings.description[:200]
+    else:
+        current_col.description = None
+        
     current_col.display_images = settings.display_images
     current_col.display_mode = settings.display_mode
     
