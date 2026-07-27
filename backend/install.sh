@@ -25,7 +25,7 @@ chmod -R 775 /opt/linkoteca/backend
 
 # Install systemd service
 echo "Installing systemd service..."
-cp /opt/linkoteca/backend/linkoteca-backend.service /etc/systemd/system/
+install -m 644 -C /opt/linkoteca/backend/linkoteca-backend.service /etc/systemd/system/linkoteca-backend.service
 systemctl daemon-reload
 systemctl enable linkoteca-backend
 systemctl restart linkoteca-backend
