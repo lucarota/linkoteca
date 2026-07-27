@@ -9,8 +9,10 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
   const [totalPages, setTotalPages] = useState(1)
   const [hoveredLink, setHoveredLink] = useState<number | null>(null)
   const [openMenuId, setOpenMenuId] = useState<number | null>(null)
+  const [loading, setLoading] = useState(true)
 
   const fetchLinks = useCallback(async () => {
+    setLoading(true)
     try {
       const token = localStorage.getItem('linkoteca_token')
       const headers: any = {}
@@ -32,6 +34,8 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
       }
     } catch {
       // ignore
+    } finally {
+      setLoading(false)
     }
   }, [collectionName, search, archived, page, tagsParam])
 
@@ -221,7 +225,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
             ))}
           </div>
         )}
-        {links.length === 0 && (
+        {links.length === 0 && !loading && (
           archived ? (
             <div className="py-10 text-center text-gray-500">No links archived.</div>
           ) : (
