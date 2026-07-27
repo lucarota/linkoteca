@@ -1,9 +1,10 @@
 import {useState, useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {API_URL} from '../config';
 
 function AuthScreen() {
-    const [name, setName] = useState('')
+    const [searchParams] = useSearchParams()
+    const [name, setName] = useState(searchParams.get('login') || '')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [stats, setStats] = useState({links: 0, collections: 0})

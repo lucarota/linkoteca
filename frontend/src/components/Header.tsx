@@ -90,6 +90,13 @@ function Header({ collectionName, isOwner, search, setSearch, collectionDescript
             </div>
           </div>
         )}
+
+        {!isOwner && (
+          <h2 className="hover:text-blue-600 py-0.5 mx-2 text-gray-600 cursor-pointer" onClick={() => navigate(`/?login=${collectionName}`)}>
+            Login
+          </h2>
+        )}
+
       </div>
       <div className="flex bg-gray-50 items-center justify-center">
         <p className="text-gray-500">{collectionDescription}</p>
