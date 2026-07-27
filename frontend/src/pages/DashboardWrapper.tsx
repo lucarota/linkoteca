@@ -14,6 +14,7 @@ function DashboardWrapper() {
     const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams()
     const tagsParam = searchParams.get('tags') || ''
+    const [addedLink, setAddedLink] = useState<any>(null)
 
     useEffect(() => {
         const fetchInfo = async () => {
@@ -43,7 +44,7 @@ function DashboardWrapper() {
     return (
         <>
             <Header collectionName={collectionName} isOwner={colInfo.is_owner} search={search} setSearch={setSearch}
-                    archived={archived} setArchived={setArchived} collectionDescription={colInfo.description}/>
+                    archived={archived} setArchived={setArchived} collectionDescription={colInfo.description} onUrlAdded={setAddedLink} />
             <Dashboard
                 collectionName={collectionName!}
                 isOwner={colInfo.is_owner}
@@ -53,6 +54,7 @@ function DashboardWrapper() {
                 archived={archived}
                 setArchived={setArchived}
                 tagsParam={tagsParam}
+                addedLink={addedLink}
                 onTagClick={(tag: string) => {
                     const currentTags = tagsParam ? tagsParam.split(',') : []
                     if (!currentTags.includes(tag)) {

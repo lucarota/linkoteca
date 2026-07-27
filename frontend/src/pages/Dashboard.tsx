@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { API_URL } from '../config';
 import DropdownMenu from '../components/DropdownMenu';
 
-function Dashboard({ collectionName, isOwner, search, displayMode, displayImages, archived, setArchived, tagsParam, onTagClick }: any) {
+function Dashboard({ collectionName, isOwner, search, displayMode, displayImages, archived, setArchived, tagsParam, addedLink, onTagClick }: any) {
   const [links, setLinks] = useState<any[]>([])
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -46,6 +46,44 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
   useEffect(() => {
     setPage(1)
   }, [search, archived, tagsParam])
+
+  useEffect(() => {
+    if (addedLink) {
+      setLinks(prev => {
+        const filtered = prev.filter(l => l.id !== addedLink.id);
+        return [addedLink, ...filtered];
+      });
+      if (!addedLink.title) {
+        pollLink(addedLink.id);
+      }
+    }
+  }, [addedLink])
+
+  const pollLink = (id: number) => {
+    const token = localStorage.getItem('linkoteca_token')
+    let attempts = 0
+    const interval = setInterval(async () => {
+      attempts++
+      if (attempts > 15) {
+        clearInterval(interval)
+        return
+      }
+      try {
+        const headers: any = {}
+        if (token) headers['Authorization'] = `Bearer ${token}`
+        const res = await fetch(`${API_URL}/link/${id}`, { headers })
+        if (res.ok) {
+          const updatedLink = await res.json()
+          if (updatedLink.title || updatedLink.image || updatedLink.description) {
+            setLinks(prev => prev.map(l => l.id === id ? updatedLink : l))
+            clearInterval(interval)
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }, 2000)
+  }
 
   const deleteLink = async (id: number) => {
     if (!isOwner) return

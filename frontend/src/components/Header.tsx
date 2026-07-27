@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config';
 
-function Header({ collectionName, isOwner, search, setSearch, collectionDescription}: any) {
+function Header({ collectionName, isOwner, search, setSearch, collectionDescription, onUrlAdded}: any) {
   const [newUrl, setNewUrl] = useState('')
   const navigate = useNavigate()
 
@@ -10,13 +10,19 @@ function Header({ collectionName, isOwner, search, setSearch, collectionDescript
     e.preventDefault()
     if (!newUrl) return
     const token = localStorage.getItem('linkoteca_token')
-    await fetch(`${API_URL}/link`, {
+    const res = await fetch(`${API_URL}/link`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ url: newUrl })
     })
+    
+    if (res.ok) {
+      const data = await res.json()
+      if (onUrlAdded) {
+        onUrlAdded(data)
+      }
+    }
     setNewUrl('')
-    window.location.reload()
   }
 
   const handleLogout = () => {
