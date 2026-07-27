@@ -1,10 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config';
 
 function Header({ collectionName, isOwner, search, setSearch, collectionDescription, onUrlAdded}: any) {
   const [newUrl, setNewUrl] = useState('')
+  const [stats, setStats] = useState<{ archived: number, unarchived: number } | null>(null)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!isOwner) return
+      const token = localStorage.getItem('linkoteca_token')
+      const res = await fetch(`${API_URL}/links/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (res.ok) {
+        setStats(await res.json())
+      }
+    }
+    fetchStats()
+  }, [isOwner])
 
   const handleSave = async (e: any) => {
     e.preventDefault()
@@ -20,6 +35,11 @@ function Header({ collectionName, isOwner, search, setSearch, collectionDescript
       const data = await res.json()
       if (onUrlAdded) {
         onUrlAdded(data)
+      }
+      if (stats) {
+        setStats({...stats, unarchived: stats.unarchived + 1})
+      } else {
+        setStats({ archived: 0, unarchived: 0 })
       }
     }
     setNewUrl('')
@@ -73,6 +93,23 @@ function Header({ collectionName, isOwner, search, setSearch, collectionDescript
             </form>
           </div>
         </div>
+
+        {isOwner && stats && (
+          <div className="hidden sm:flex items-center text-xs text-gray-400 mx-2 space-x-3 cursor-default">
+            <span className="flex items-center transition-colors" title="Links Active">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+              {stats.unarchived}
+            </span>
+            <span className="flex items-center transition-colors" title="Links Archived">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+              {stats.archived}
+            </span>
+          </div>
+        )}
 
         {isOwner && (
           <div className="cursor-pointer" onClick={() => navigate(`/${collectionName}/settings`)}>

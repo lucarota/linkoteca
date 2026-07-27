@@ -110,7 +110,7 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
       <div className="px-2 md:px-5">
         <div className="w-full mx-auto flex justify-between py-5">
           <div className="items-center flex flex-1">
-            <a className="flex cursor-pointer" onClick={() => setArchived(!archived)}>
+            <a className="flex cursor-pointer" onClick={() => setArchived(!archived)} title={`Links ${archived ? 'Active' : 'Archived'}`}>
               <div className={`py-1 px-2 rounded flex items-center border ${archived ? 'border-blue-500 bg-blue-50' : 'border-gray-100 bg-gray-50'} mr-2`}>
                 <div className={`cursor-pointer px-2 ${archived ? 'text-blue-600' : ''}`}>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
