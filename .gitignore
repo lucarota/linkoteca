@@ -3,6 +3,4 @@
 backend/linkoteca.db
 package-lock.json
 **/__pycache__
-.credential
-deploy_frontend.sh
-priv_*.py
+/deploy/
