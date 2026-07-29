@@ -15,6 +15,7 @@ function AuthScreen() {
         if (savedName) {
             navigate(`/${savedName}`)
         }
+        document.title = 'Linkoteca';
 
         fetch(`${API_URL}/stats`)
             .then(res => res.json())

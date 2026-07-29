@@ -20,6 +20,7 @@ function DashboardWrapper() {
         const fetchInfo = async () => {
             const token = localStorage.getItem('linkoteca_token')
             const headers: any = {}
+            document.title = `Linkoteca - ${collectionName}`;
             if (token) headers['Authorization'] = `Bearer ${token}`
 
             const res = await fetch(`${API_URL}/collection/${collectionName}`, {headers})
