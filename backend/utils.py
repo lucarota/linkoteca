@@ -1,111 +1,174 @@
 import json
 import metadata_parser
 import requests
-from bs4 import BeautifulSoup
 import time
-from datetime import datetime
+from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from sqlalchemy import select
+from urllib.parse import urljoin
 
 from database import SessionLocal
 from models import Link
 
 metadata_executor = ThreadPoolExecutor(max_workers=3)
 
+def extract_favicon(soup, url):
+    icon_links = soup.find_all("link")
+    links = [l for l in icon_links if l.get('rel') and any('icon' in x.lower() for x in l.get('rel'))]
+    best_favicon = None
+    min_diff = float('inf')
+    for link in links:
+        href = link.get('href')
+        if not href:
+            continue
+        sizes = link.get('sizes')
+        size = 0
+        if sizes and isinstance(sizes, list):
+            sizes = sizes[0]
+        if sizes and sizes.lower() != 'any':
+            try:
+                size = int(sizes.lower().split('x')[0])
+            except Exception:
+                pass
+        else:
+            size = 32
+        diff = abs(size - 16)
+        if diff < min_diff:
+            min_diff = diff
+            best_favicon = href
+    if best_favicon:
+        from urllib.parse import urljoin
+        if best_favicon.startswith("/"):
+            best_favicon = urljoin(url, best_favicon)
+        elif not best_favicon.startswith("http"):
+            best_favicon = urljoin(url, best_favicon)
+        return best_favicon
+    return None
+
+def extract_metadata_with_bs4(url: str, result: dict, soup=None, headers=None) -> None:
+    if soup is None:
+        if headers is None:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+        response = requests.get(url, headers=headers, timeout=5)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, features="lxml")
+
+    if not result['title']:
+        title_tag = soup.find('title')
+        if title_tag and title_tag.string:
+            result['title'] = title_tag.string.strip()
+        if not result['title']:
+            for tag in ['og:title', 'twitter:title']:
+                meta = soup.find('meta', property=tag) or soup.find('meta', attrs={'name': tag})
+                if meta and meta.get('content'):
+                    result['title'] = meta.get('content').strip()
+                    break
+
+    if not result['description']:
+        for tag in ['description', 'og:description', 'twitter:description']:
+            meta = soup.find('meta', property=tag) or soup.find('meta', attrs={'name': tag})
+            if meta and meta.get('content'):
+                result['description'] = meta.get('content').strip()
+                break
+
+    if not result['image']:
+        for tag in ['og:image', 'twitter:image', 'image']:
+            meta = soup.find('meta', property=tag) or soup.find('meta', attrs={'name': tag})
+            if meta and meta.get('content'):
+                result['image'] = meta.get('content')
+                break
+        if not result['image']:
+            link_tag = soup.find('link', rel='image_src')
+            if link_tag and link_tag.get('href'):
+                result['image'] = link_tag.get('href')
+
+    if not result['image'] or not result['title'] or not result['description']:
+        for script in soup.find_all('script', type='application/ld+json'):
+            try:
+                data = json.loads(script.string)
+
+                def find_keys(obj):
+                    if isinstance(obj, dict):
+                        if not result['title']:
+                            if 'headline' in obj and isinstance(obj['headline'], str):
+                                result['title'] = obj['headline']
+                            elif 'name' in obj and isinstance(obj['name'], str):
+                                result['title'] = obj['name']
+                        if not result['description']:
+                            if 'description' in obj and isinstance(obj['description'], str):
+                                result['description'] = obj['description']
+                        if not result['image']:
+                            if 'thumbnailUrl' in obj:
+                                if isinstance(obj['thumbnailUrl'], str):
+                                    result['image'] = obj['thumbnailUrl']
+                                elif isinstance(obj['thumbnailUrl'], list) and len(obj['thumbnailUrl']) > 0:
+                                    result['image'] = obj['thumbnailUrl'][0]
+                        for v in obj.values():
+                            find_keys(v)
+                    elif isinstance(obj, list):
+                        for item in obj:
+                            find_keys(item)
+
+                find_keys(data)
+                if result['image'] and result['title'] and result['description']:
+                    break
+            except Exception:
+                continue
+
+    if not result['favicon']:
+        favicon = extract_favicon(soup, url)
+        if favicon:
+            result['favicon'] = favicon
+
 def fetch_metadata_for_url(url: str) -> dict:
     """Fetches the title, description, and preview image metadata for a given URL."""
     result = {'title': None, 'description': None, 'image': None, 'favicon': None}
+    soup = None
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    
     try:
-        page = metadata_parser.MetadataParser(url=url, search_head_only=False)
+        page = metadata_parser.MetadataParser(url=url,
+                                              force_doctype=True,
+                                              search_head_only=False,
+                                              only_parse_http_ok=False,
+                                              support_malformed=True,
+                                              url_headers=headers)
+
         img = page.get_metadata_link('image')
         if img:
             result['image'] = img
-        title_meta = page.get_metadatas('title')
+        title_meta = page.parsed_result.get_metadatas('title')
         if title_meta:
-            result['title'] = title_meta[0]
-        desc_meta = page.get_metadatas('description')
+            for v in title_meta.values():
+                if v:
+                    result['title'] = v[0]
+                    break
+        desc_meta = page.parsed_result.get_metadatas('description')
         if desc_meta:
-            result['description'] = desc_meta[0]
-    except Exception:
+            for v in desc_meta.values():
+                if v:
+                    result['description'] = v[0]
+                    break
+        if hasattr(page.parsed_result, 'soup'):
+            soup = page.parsed_result.soup
+            if not result['favicon']:
+                favicon = extract_favicon(soup, url)
+                if favicon:
+                    result['favicon'] = favicon
+    except Exception as e:
+        print(f"Error parsing metadata: {e}")
         pass
 
     if not result['image'] or not result['title'] or not result['description']:
         try:
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-            response = requests.get(url, headers=headers, timeout=5)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, features="lxml")
-
-            if not result['title']:
-                title_tag = soup.find('title')
-                if title_tag and title_tag.string:
-                    result['title'] = title_tag.string.strip()
-                if not result['title']:
-                    for tag in ['og:title', 'twitter:title']:
-                        meta = soup.find('meta', property=tag) or soup.find('meta', attrs={'name': tag})
-                        if meta and meta.get('content'):
-                            result['title'] = meta.get('content').strip()
-                            break
-
-            if not result['description']:
-                for tag in ['description', 'og:description', 'twitter:description']:
-                    meta = soup.find('meta', property=tag) or soup.find('meta', attrs={'name': tag})
-                    if meta and meta.get('content'):
-                        result['description'] = meta.get('content').strip()
-                        break
-
-            if not result['image']:
-                for tag in ['og:image', 'twitter:image', 'image']:
-                    meta = soup.find('meta', property=tag) or soup.find('meta', attrs={'name': tag})
-                    if meta and meta.get('content'):
-                        result['image'] = meta.get('content')
-                        break
-                if not result['image']:
-                    link_tag = soup.find('link', rel='image_src')
-                    if link_tag and link_tag.get('href'):
-                        result['image'] = link_tag.get('href')
-
-            if not result['image'] or not result['title'] or not result['description']:
-                for script in soup.find_all('script', type='application/ld+json'):
-                    try:
-                        data = json.loads(script.string)
-
-                        def find_keys(obj):
-                            if isinstance(obj, dict):
-                                if not result['title']:
-                                    if 'headline' in obj and isinstance(obj['headline'], str):
-                                        result['title'] = obj['headline']
-                                    elif 'name' in obj and isinstance(obj['name'], str):
-                                        result['title'] = obj['name']
-                                if not result['description']:
-                                    if 'description' in obj and isinstance(obj['description'], str):
-                                        result['description'] = obj['description']
-                                if not result['image']:
-                                    if 'thumbnailUrl' in obj:
-                                        if isinstance(obj['thumbnailUrl'], str):
-                                            result['image'] = obj['thumbnailUrl']
-                                        elif isinstance(obj['thumbnailUrl'], list) and len(obj['thumbnailUrl']) > 0:
-                                            result['image'] = obj['thumbnailUrl'][0]
-                                for v in obj.values():
-                                    find_keys(v)
-                            elif isinstance(obj, list):
-                                for item in obj:
-                                    find_keys(item)
-
-                        find_keys(data)
-                        if result['image'] and result['title'] and result['description']:
-                            break
-                    except Exception:
-                        continue
-
-            if not result['favicon']:
-                icon_link = soup.find("link", rel="shortcut icon")
-                if icon_link is None:
-                    icon_link = soup.find("link", rel="icon")
-                if icon_link:
-                    result['favicon'] = icon_link.get("href", "")
-        except Exception:
+            extract_metadata_with_bs4(url, result, soup, headers)
+        except Exception as e:
+            print(f"Error parsing metadata BeautifulSoup: {e}")
             pass
 
     return result

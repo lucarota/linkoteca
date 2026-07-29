@@ -23,12 +23,16 @@ class TokenResponse(BaseModel):
 class LinkstoreImportRequest(BaseModel):
     token: str
 
+class UrlRequest(BaseModel):
+    url: str
+
 class LinkCreate(BaseModel):
     url: str
     title: Optional[str] = None
     description: Optional[str] = None
     tags: Optional[str] = None
     image: Optional[str] = None
+    favicon: Optional[str] = None
 
 class LinkResponse(BaseModel):
     id: int

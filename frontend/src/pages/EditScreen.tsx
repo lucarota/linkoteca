@@ -60,11 +60,34 @@ function EditScreen() {
                 title: link.title,
                 description: link.description,
                 image: link.image,
+                favicon: link.favicon,
                 tags: Array.from(selectedTags).join(',') + (newTagsString ? ',' + newTagsString : '')
             })
         })
         navigate(`/${collectionName}`)
     }
+
+    const handleRefreshMetadata = async () => {
+        if (!link.url) return;
+        if (window.confirm("Warning: Current metadata will be overwritten. Do you want to proceed?")) {
+            const token = localStorage.getItem('linkoteca_token');
+            const res = await fetch(`${API_URL}/metadata`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                body: JSON.stringify({ url: link.url })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setLink((prev: any) => ({
+                    ...prev,
+                    title: data.title || '',
+                    description: data.description || '',
+                    image: data.image || '',
+                    favicon: data.favicon || '',
+                }));
+            }
+        }
+    };
 
     if (!link) return <div className="p-10 text-center">Loading...</div>
 
@@ -130,6 +153,16 @@ function EditScreen() {
                                         />
                                     </div>
                                     <div className="my-4">
+                                        <label className="my-2 block text-sm font-medium leading-5 text-gray-700">Favicon URL</label>
+                                        <input
+                                            type="url"
+                                            className="w-full p-3 appearance-none block text-gray-700 border text-md border-gray-200 rounded px-4 leading-tight focus:outline-none focus:bg-white"
+                                            value={link.favicon || ''}
+                                            onChange={e => setLink({...link, favicon: e.target.value})}
+                                            placeholder="Enter URL"
+                                        />
+                                    </div>
+                                    <div className="my-4">
                                         <label className="my-2 block text-sm font-medium leading-5 text-gray-700">Create
                                             new tags</label>
                                         <input
@@ -165,10 +198,15 @@ function EditScreen() {
                         </div>
                     </div>
                     <div className="mt-8 border-t border-gray-200 pt-5">
-                        <div className="flex justify-end">
+                        <div className="flex justify-between">
+                            <button type="button"
+                                    onClick={handleRefreshMetadata}
+                                    className="capitalize bg-white hover:bg-gray-100 text-gray-800 font-medium py-2 px-5 border border-gray-300 rounded text-sm">
+                                Refresh Metadata
+                            </button>
                             <button type="submit"
                                     className="capitalize bg-black hover:bg-blue-600 text-white font-medium py-2 px-5 border text-sm border-transparent hover:border-transparent rounded">
-                                save
+                                Save
                             </button>
                         </div>
                     </div>
@@ -183,7 +221,10 @@ function EditScreen() {
                                     <div
                                         className="text-xs overflow-hidden break-all border-gray-200 flex justify-between items-center">
                                         <a href={link.url} target="_blank" rel="noopener noreferrer"
-                                           className="py-1 font-light break-all">{link.url}</a>
+                                           className="py-1 font-light break-all flex items-center gap-1.5">
+                                           {link.favicon && <img src={link.favicon} alt="favicon" className="w-4 h-4 object-contain shrink-0" />}
+                                           <span className="truncate">{link.url}</span>
+                                        </a>
                                     </div>
                                     <div className="flex flex-row py-1">
                                         <a href={link.url} target="_blank" rel="noopener noreferrer"

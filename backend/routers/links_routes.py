@@ -6,11 +6,11 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from models import Collection, Link, Tag
-from schemas import LinkCreate, LinkResponse, PaginatedLinksResponse
+from schemas import LinkCreate, LinkResponse, PaginatedLinksResponse, UrlRequest
 from sqlalchemy import or_, select, func
 from sqlalchemy.orm import Session
 from typing import Optional
-from utils import format_link, background_fetch_metadata, metadata_executor
+from utils import format_link, background_fetch_metadata, metadata_executor, fetch_metadata_for_url
 
 router = APIRouter(tags=["Links"])
 
@@ -31,7 +31,8 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db),
         url=link.url,
         title=link.title,
         description=link.description,
-        image=link.image
+        image=link.image,
+        favicon=link.favicon
     )
     if link.tags:
         seen_tags = set()
@@ -51,6 +52,12 @@ def create_link(link: LinkCreate, db: Session = Depends(get_db),
     return format_link(new_link)
 
 
+@router.post("/api/metadata")
+def get_url_metadata(req: UrlRequest, db: Session = Depends(get_db), current_col: Collection = Depends(get_api_or_current_collection)):
+    """Fetches metadata for a given URL on demand."""
+    return fetch_metadata_for_url(req.url)
+
+
 @router.put("/api/link/{link_id}", response_model=LinkResponse)
 def update_link(link_id: int, link: LinkCreate, db: Session = Depends(get_db),
                 current_col: Collection = Depends(get_current_collection)):
@@ -63,6 +70,7 @@ def update_link(link_id: int, link: LinkCreate, db: Session = Depends(get_db),
     db_link.title = link.title
     db_link.description = link.description
     db_link.image = link.image
+    db_link.favicon = link.favicon
 
     db_link.tags.clear()
     if link.tags:
