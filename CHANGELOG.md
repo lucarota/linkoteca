@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2026-08-16
+
+### Added
+- **Pagination:** Implemented a reusable `Pagination` component and integrated it into the Dashboard.
+- **Metadata:** Added on-demand metadata refresh and improved favicon support.
+- **Auth Screen:** Added a playful definition section for "linkoteca".
+
+### Changed
+- **UI & UX Enhancements:**
+  - Refactored and simplified the `EditScreen` layout to improve responsiveness and component organization.
+  - Updated document titles to accurately reflect "Linkoteca" across all pages.
+  - Adjusted styling and added pointer cursors to buttons in the `Header` and `SettingsScreen`.
+- **Data Handling:** Improved collection name sanitization in both frontend and backend.
+
+### Fixed
+- **Data Loading:** Added request deduplication logic to `fetchLinks` in the Dashboard to prevent race conditions during data fetching.
+
 ## [1.0.2] - 2026-07-27
 
 ### Added
