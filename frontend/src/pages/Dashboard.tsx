@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { API_URL } from '../config';
 import DropdownMenu from '../components/DropdownMenu';
+import Pagination from '../components/Pagination';
 
 function Dashboard({ collectionName, isOwner, search, displayMode, displayImages, archived, setArchived, tagsParam, addedLink, onTagClick }: any) {
   const [links, setLinks] = useState<any[]>([])
@@ -128,20 +129,8 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
             </a>
           </div>
 
-          <div className="py-1 border border-gray-100 bg-gray-50 rounded items-center flex">
-            <div className="flex items-center ">   
-              <div className="px-2 flex justify-between  text-gray-700">
-                <a className={`${page <= 1 ? 'disabled-link text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:text-blue-600'} relative inline-flex items-center text-xs leading-5 font-medium rounded-md px-2`} onClick={() => page > 1 && setPage(page - 1)}>Previous</a>
-                <div className="flex shrink-0 px-2">
-                  <p className="text-xs leading-5  text-gray-700">
-                    <span className="font-medium">{page}</span>
-                    /
-                    <span className="font-medium">{totalPages}</span>
-                  </p>
-                </div>
-                <a className={`${page >= totalPages ? 'disabled-link text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:text-blue-600'} relative inline-flex items-center px-2 text-xs leading-5 font-medium rounded-md`} onClick={() => page < totalPages && setPage(page + 1)}>Next</a>
-              </div>
-            </div>
+          <div className="py-1 border border-gray-100 bg-gray-50 rounded items-center flex px-1">
+            <Pagination page={page} totalPages={totalPages} setPage={setPage} />
           </div>
         </div>
 
@@ -301,6 +290,13 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
               </div>
             </div>
           )
+        )}
+        {links.length > 0 && (
+          <div className="w-full mx-auto flex justify-end py-5 mt-4">
+            <div className="py-1 border border-gray-100 bg-gray-50 rounded items-center flex px-1">
+              <Pagination page={page} totalPages={totalPages} setPage={setPage} />
+            </div>
+          </div>
         )}
       </div>
     </div>
