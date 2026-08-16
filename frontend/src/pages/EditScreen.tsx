@@ -98,10 +98,9 @@ function EditScreen() {
             <div className="w-full max-w-[120rem] mx-auto my-10 px-4 xl:px-8">
                 <div className="grid grid-cols-1 xl:grid-cols-[1fr_minmax(auto,42rem)_1fr] gap-10 xl:gap-8 items-start">
                     
-                    <div className="order-1 xl:order-none xl:col-start-1 flex xl:justify-end">
-                        <div className="w-full max-w-2xl xl:max-w-[22rem] mx-auto xl:mx-0 xl:sticky xl:top-10 h-fit">
-                            <div className="bg-gray-50 sm:rounded-lg">
-                                <div className="px-4 py-5">
+                    <div className="order-1 xl:order-none xl:col-start-1 w-full max-w-2xl xl:max-w-[22rem] mx-auto xl:mx-0 xl:sticky xl:top-10 xl:justify-self-end h-fit">
+                        <div className="bg-gray-50 sm:rounded-lg">
+                            <div className="px-4 py-5">
                                     <h3 className="text-lg leading-6 font-medium text-gray-900">Preview</h3>
                                     <div className="mt-5">
                                         <div className="flex-col">
@@ -139,7 +138,6 @@ function EditScreen() {
                                 </div>
                             </div>
                         </div>
-                    </div>
 
                     <div className="order-2 xl:order-none xl:col-start-2 w-full max-w-2xl mx-auto">
                         <form onSubmit={handleSave}>
