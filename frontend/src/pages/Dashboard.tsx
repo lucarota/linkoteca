@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { API_URL } from '../config';
 import DropdownMenu from '../components/DropdownMenu';
@@ -10,8 +10,10 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
   const [hoveredLink, setHoveredLink] = useState<number | null>(null)
   const [openMenuId, setOpenMenuId] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
+  const requestCounter = useRef(0)
 
   const fetchLinks = useCallback(async () => {
+    const currentRequestId = ++requestCounter.current
     setLoading(true)
     try {
       const token = localStorage.getItem('linkoteca_token')
@@ -26,6 +28,9 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
       url.searchParams.append('page', page.toString())
 
       const res = await fetch(url.toString(), { headers })
+      
+      if (currentRequestId !== requestCounter.current) return;
+
       if (res.ok) {
         const data = await res.json()
         setLinks(data.items || [])
@@ -35,7 +40,9 @@ function Dashboard({ collectionName, isOwner, search, displayMode, displayImages
     } catch {
       // ignore
     } finally {
-      setLoading(false)
+      if (currentRequestId === requestCounter.current) {
+        setLoading(false)
+      }
     }
   }, [collectionName, search, archived, page, tagsParam])
 
