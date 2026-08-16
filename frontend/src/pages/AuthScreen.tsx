@@ -56,7 +56,8 @@ function AuthScreen() {
         <div className="container mx-auto max-w-3xl p-4 py-10">
             <header>
                 <h1 className="flex justify-center font-bold tracking-tight text-4xl text-center">
-                    <a href="/">
+                    <div className="relative inline-flex items-start">
+                        <a href="/">
                         <svg width="207.64" height="28.72" viewBox="0 0 207.64 28.72"
                              xmlns="http://www.w3.org/2000/svg">
                             <g id="svgGroup" strokeLinecap="round" fillRule="evenodd" fontSize="9pt" stroke="#000000"
@@ -67,7 +68,9 @@ function AuthScreen() {
                                     vectorEffect="non-scaling-stroke"></path>
                             </g>
                         </svg>
-                    </a>
+                        </a>
+                        <a href="#definition" className="absolute -top-3 -right-6 text-2xl font-bold text-gray-400 hover:text-gray-900 transition-colors leading-none" title="Definition">*</a>
+                    </div>
                 </h1>
                 <p className="tracking-tighter text-center">{stats.links} links saved
                     in {stats.collections} collections</p>
@@ -212,6 +215,34 @@ function AuthScreen() {
                             </div>
                         </div>
                     </div>
+
+                    <div id="definition" className="relative py-10 mt-10">
+                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                            <div className="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div className="relative flex justify-center">
+                            <h2 className="px-2 bg-white text-lg font-medium text-gray-600">
+                                Definition
+                            </h2>
+                        </div>
+                    </div>
+                    <div className="mx-auto px-4 md:px-0 sm:px-6 lg:px-8 text-gray-700 text-sm md:text-base space-y-4 pb-10">
+                        <p><strong>linkoteca</strong> <em>/ˌlɪŋkəˈtɛkə/</em> <em>noun</em> (plural: <strong>linkoteche</strong>)</p>
+                        <p><strong>Etymology:</strong> From the English word <strong>link</strong> (&quot;hyperlink&quot; or &quot;web link&quot;) combined with the Italian suffix <strong>-teca</strong>, derived from Ancient Greek <em>thḗkē</em> (&quot;repository, storage place, collection&quot;). The suffix appears in Italian words such as <em>biblioteca</em> (library), <em>mediateca</em> (media library), and <em>videoteca</em> (video library). Literally, <strong>&quot;a repository or collection of links.&quot;</strong></p>
+                        <p><strong>Definition:</strong></p>
+                        <ol className="list-decimal pl-6 space-y-2">
+                            <li>An organized collection of hyperlinks to websites, online resources, documents, or digital services, usually arranged by topic or category.</li>
+                            <li>By extension, a website, application, or section dedicated to storing, organizing, and browsing hyperlinks.</li>
+                        </ol>
+                        <p><strong>Examples:</strong></p>
+                        <ul className="list-disc pl-6 space-y-2">
+                            <li><em>I keep all my research resources in my personal linkoteca.</em></li>
+                            <li><em>The company maintains a linkoteca for internal documentation and useful tools.</em></li>
+                        </ul>
+                        <p><strong>Usage note:</strong> <em>Linkoteca</em> is an <strong>Italian neologism</strong>, coined by combining the English word <strong>link</strong> with the productive Italian suffix <strong>-teca</strong>. Although it is not currently recorded in major Italian dictionaries, it follows established Italian word-formation patterns and is immediately understandable to Italian speakers as meaning &quot;a collection or repository of links.&quot;</p>
+                        <p><strong>Lexicographical note</strong>: <em>Linkoteca</em> is a coined Italian term, formed according to standard Italian morphological rules. It may be considered analogous to English formations such as <em>link repository</em>, <em>link library</em>, or <em>bookmark collection</em>, although it has no direct one-word equivalent in English.</p>
+                    </div>
+
                 </div>
             </main>
         </div>
