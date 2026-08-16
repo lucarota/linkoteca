@@ -45,6 +45,13 @@ function AuthScreen() {
         }
     }
 
+    const cleanCollectionName = (name: string) => {
+        name = name.trim()
+        name = name.toLowerCase()
+        name = name.replace(/[^a-z0-9_-]+/g, '_')
+        setName(name)
+    }
+
     return (
         <div className="container mx-auto max-w-3xl p-4 py-10">
             <header>
@@ -96,7 +103,7 @@ function AuthScreen() {
                                         placeholder="Enter collection name"
                                         type="text"
                                         value={name}
-                                        onChange={e => setName(e.target.value.toLowerCase())}
+                                        onChange={e => cleanCollectionName(e.target.value)}
                                         required
                                     />
                                 </div>

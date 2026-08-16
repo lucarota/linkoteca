@@ -14,7 +14,10 @@ router = APIRouter(tags=["Authentication"])
 @router.post("/api/register")
 def register(col: CollectionCreate, db: Session = Depends(get_db)):
     """Registers a new collection and returns a JWT token."""
+    col.name = col.name.strip()
     col.name = col.name.lower()
+    col.name = re.sub(r'[^a-z0-9_-]+', '_', col.name)
+
     if col.name in ["directory", "api", "settings", "admin", "static"]:
         raise HTTPException(status_code=400, detail="This collection name is reserved")
         
