@@ -108,7 +108,7 @@ function SettingsScreen() {
                                         </legend>
                                         <div className="mt-4">
                       <textarea
-                          className="shadow-inner appearance-none block w-full text-gray-700 border text-sm border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 resize-y min-h-[100px]"
+                          className="shadow-inner appearance-none block w-full text-gray-700 border text-sm border-gray-300 rounded p-2 focus:outline-none focus:border-blue-500 resize-y min-h-25"
                           placeholder="Write a short description about this collection (optional)"
                           maxLength={200}
                           value={settings.description || ''}
@@ -266,7 +266,7 @@ function SettingsScreen() {
                             </div>
                             <button
                                 type="button"
-                                className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:shadow-outline-blue transition ease-in-out duration-150 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                className="cursor-pointer mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent font-medium rounded-md text-white bg-black hover:bg-blue-600 hover:text-white focus:outline-none focus:shadow-outline-blue transition ease-in-out duration-150 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                                 onClick={startImport}
                                 disabled={importing || !linkstoreToken}
                             >
@@ -302,17 +302,17 @@ function SettingsScreen() {
                                                                 <p className="cursor-pointer select-all text-yellow-900 font-mono break-all">{newToken}</p>
                                                             </div>
                                                         ) : tokens.length > 0 ? (
-                                                            <p className="pb-5 cursor-pointer select-all text-red-500 font-bold pr-4 break-all">
+                                                            <p className="pb-5 select-all text-red-500 font-bold pr-4 break-all">
                                                                 {tokens[0].token}
                                                             </p>
                                                         ) : (
-                                                            <p className="pb-5 cursor-pointer select-all text-gray-500 font-bold pr-4 break-all">
+                                                            <p className="pb-5 select-all text-gray-500 font-bold pr-4 break-all">
                                                                 No token generated.
                                                             </p>
                                                         )}
                                                         <span className="inline-flex rounded-md shadow-sm">
                               <button onClick={createToken}
-                                      className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                      className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                 {tokens.length > 0 ? 'Generate New API Token' : 'Create API Token'}
                               </button>
                             </span>

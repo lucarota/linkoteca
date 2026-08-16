@@ -79,7 +79,7 @@ function Header({ collectionName, isOwner, search, setSearch, collectionDescript
                       required
                     />
                   </div>
-                  <button className="-ml-px relative inline-flex items-center space-x-2 px-2 border border-gray-300 text-xs font-medium rounded-r-sm text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none hover:text-blue-600" type="submit">Save</button>
+                  <button className="cursor-pointer -ml-px relative inline-flex items-center space-x-2 px-2 border border-gray-300 text-xs font-medium rounded-r-sm text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none hover:text-blue-600" type="submit">Save</button>
                 </div>
               </form>
             </div>
