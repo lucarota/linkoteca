@@ -59,7 +59,7 @@ function PublicDirectoryScreen() {
       <main>
         <div className="w-full mx-auto flex flex-col sm:flex-row justify-between py-5 gap-4 items-center">
           <div className="flex-1 self-start sm:self-center">
-             <button onClick={() => navigate('/')} className="text-gray-500 hover:text-blue-600 text-sm font-medium">← Back to home</button>
+             <button onClick={() => navigate('/')} className="cursor-pointer text-gray-500 hover:text-blue-600 text-sm font-medium">← Back to home</button>
           </div>
           <div className="flex-1 flex justify-center w-full">
             <input 
