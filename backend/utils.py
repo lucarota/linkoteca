@@ -1,17 +1,61 @@
+import ipaddress
 import json
 import metadata_parser
 import requests
+import socket
 import time
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from sqlalchemy import select
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 from database import SessionLocal
 from models import Link
 
 metadata_executor = ThreadPoolExecutor(max_workers=3)
+
+def is_safe_url(url: str) -> bool:
+    """
+    Validates that a URL is safe for outbound requests and does not target
+    loopback, private, link-local, or reserved network addresses (SSRF mitigation).
+    """
+    if not url or not isinstance(url, str):
+        return False
+
+    try:
+        parsed = urlparse(url.strip())
+    except Exception:
+        return False
+
+    if parsed.scheme.lower() not in ("http", "https"):
+        return False
+
+    hostname = parsed.hostname
+    if not hostname:
+        return False
+
+    try:
+        addr_info = socket.getaddrinfo(hostname, None)
+        if not addr_info:
+            return False
+
+        for _, _, _, _, sockaddr in addr_info:
+            ip_str = sockaddr[0]
+            ip = ipaddress.ip_address(ip_str)
+
+            if (
+                ip.is_private
+                or ip.is_loopback
+                or ip.is_link_local
+                or ip.is_reserved
+                or ip.is_multicast
+                or ip.is_unspecified
+            ):
+                return False
+        return True
+    except Exception:
+        return False
 
 def extract_favicon(soup, url):
     icon_links = soup.find_all("link")
@@ -47,14 +91,28 @@ def extract_favicon(soup, url):
     return None
 
 def extract_metadata_with_bs4(url: str, result: dict, soup=None, headers=None) -> None:
+    if not is_safe_url(url):
+        return
+
     if soup is None:
         if headers is None:
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             }
-        response = requests.get(url, headers=headers, timeout=5)
+        response = requests.get(url, headers=headers, timeout=5, stream=True)
         response.raise_for_status()
-        soup = BeautifulSoup(response.text, features="lxml")
+
+        # Read at most 2MB of content to prevent memory exhaustion
+        max_bytes = 2 * 1024 * 1024
+        chunks = []
+        downloaded = 0
+        for chunk in response.iter_content(chunk_size=8192):
+            chunks.append(chunk)
+            downloaded += len(chunk)
+            if downloaded >= max_bytes:
+                break
+        raw_html = b"".join(chunks)
+        soup = BeautifulSoup(raw_html, features="lxml")
 
     if not result['title']:
         title_tag = soup.find('title')
@@ -126,6 +184,9 @@ def extract_metadata_with_bs4(url: str, result: dict, soup=None, headers=None) -
 def fetch_metadata_for_url(url: str) -> dict:
     """Fetches the title, description, and preview image metadata for a given URL."""
     result = {'title': None, 'description': None, 'image': None, 'favicon': None}
+    if not is_safe_url(url):
+        return result
+
     soup = None
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'

@@ -1,6 +1,21 @@
 /.idea/
-.env
-backend/linkoteca.db
-package-lock.json
-**/__pycache__
 /deploy/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+*.env
+backend/.env
+*.db
+backend/*.db
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+build/
+.DS_Store

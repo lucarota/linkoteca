@@ -10,7 +10,7 @@ from models import Base
 client = TestClient(app)
 
 def random_string(k=8):
-    return "".join(random.choices(string.ascii_letters, k=k))
+    return "".join(random.choices(string.ascii_lowercase, k=k))
 
 @pytest.fixture(scope="module")
 def setup_collection():
@@ -133,7 +133,7 @@ def test_links_crud_and_tags(setup_collection):
     assert any(item["id"] == link_id for item in paginated["items"])
     
     # Get single link (pop) - requires unarchived
-    res_pop = client.get(f"/api/link?tags=test2", headers={"Authorization": f"Bearer {token}"})
+    res_pop = client.get(f"/api/links?tags=test2", headers={"Authorization": f"Bearer {token}"})
     assert res_pop.status_code == 200
     
     # Archive Link

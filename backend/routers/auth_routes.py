@@ -1,4 +1,5 @@
 import jwt
+import re
 from auth import get_password_hash, verify_password
 from config import JWT_SECRET
 from database import get_db
