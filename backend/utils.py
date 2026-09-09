@@ -57,6 +57,36 @@ def is_safe_url(url: str) -> bool:
     except Exception:
         return False
 
+MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024  # 2 MB limit
+
+def fetch_url_html(url: str, headers: dict = None, timeout: int = 5, max_bytes: int = MAX_DOWNLOAD_BYTES) -> str:
+    """Safely streams and downloads HTML from a URL with strict size and timeout limits."""
+    if not is_safe_url(url):
+        return ""
+    if headers is None:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+    try:
+        response = requests.get(url, headers=headers, timeout=timeout, stream=True)
+        response.raise_for_status()
+
+        chunks = []
+        downloaded = 0
+        for chunk in response.iter_content(chunk_size=8192):
+            chunks.append(chunk)
+            downloaded += len(chunk)
+            if downloaded >= max_bytes:
+                break
+        raw_bytes = b"".join(chunks)
+        encoding = response.encoding or 'utf-8'
+        try:
+            return raw_bytes.decode(encoding, errors='replace')
+        except Exception:
+            return raw_bytes.decode('utf-8', errors='replace')
+    except Exception:
+        return ""
+
 def extract_favicon(soup, url):
     icon_links = soup.find_all("link")
     links = [l for l in icon_links if l.get('rel') and any('icon' in x.lower() for x in l.get('rel'))]
@@ -95,24 +125,10 @@ def extract_metadata_with_bs4(url: str, result: dict, soup=None, headers=None) -
         return
 
     if soup is None:
-        if headers is None:
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-        response = requests.get(url, headers=headers, timeout=5, stream=True)
-        response.raise_for_status()
-
-        # Read at most 2MB of content to prevent memory exhaustion
-        max_bytes = 2 * 1024 * 1024
-        chunks = []
-        downloaded = 0
-        for chunk in response.iter_content(chunk_size=8192):
-            chunks.append(chunk)
-            downloaded += len(chunk)
-            if downloaded >= max_bytes:
-                break
-        raw_html = b"".join(chunks)
-        soup = BeautifulSoup(raw_html, features="lxml")
+        html = fetch_url_html(url, headers=headers, timeout=5)
+        if not html:
+            return
+        soup = BeautifulSoup(html, features="lxml")
 
     if not result['title']:
         title_tag = soup.find('title')
@@ -182,52 +198,60 @@ def extract_metadata_with_bs4(url: str, result: dict, soup=None, headers=None) -
             result['favicon'] = favicon
 
 def fetch_metadata_for_url(url: str) -> dict:
-    """Fetches the title, description, and preview image metadata for a given URL."""
+    """Fetches the title, description, and preview image metadata for a given URL with bounded size and timeouts."""
     result = {'title': None, 'description': None, 'image': None, 'favicon': None}
     if not is_safe_url(url):
         return result
 
-    soup = None
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
-    
+
+    html_content = fetch_url_html(url, headers=headers, timeout=5, max_bytes=MAX_DOWNLOAD_BYTES)
+    if not html_content:
+        return result
+
+    soup = None
     try:
-        page = metadata_parser.MetadataParser(url=url,
+        soup = BeautifulSoup(html_content, features="lxml")
+    except Exception:
+        pass
+
+    try:
+        page = metadata_parser.MetadataParser(html=html_content,
+                                              url=url,
                                               force_doctype=True,
                                               search_head_only=False,
                                               only_parse_http_ok=False,
-                                              support_malformed=True,
-                                              url_headers=headers)
+                                              support_malformed=True)
 
         img = page.get_metadata_link('image')
         if img:
             result['image'] = img
-        title_meta = page.parsed_result.get_metadatas('title')
-        if title_meta:
-            for v in title_meta.values():
-                if v:
-                    result['title'] = v[0]
-                    break
-        desc_meta = page.parsed_result.get_metadatas('description')
-        if desc_meta:
-            for v in desc_meta.values():
-                if v:
-                    result['description'] = v[0]
-                    break
-        if hasattr(page.parsed_result, 'soup'):
-            soup = page.parsed_result.soup
-            if not result['favicon']:
-                favicon = extract_favicon(soup, url)
-                if favicon:
-                    result['favicon'] = favicon
+        if hasattr(page, 'parsed_result') and hasattr(page.parsed_result, 'get_metadatas'):
+            title_meta = page.parsed_result.get_metadatas('title')
+            if title_meta:
+                for v in title_meta.values():
+                    if v:
+                        result['title'] = v[0]
+                        break
+            desc_meta = page.parsed_result.get_metadatas('description')
+            if desc_meta:
+                for v in desc_meta.values():
+                    if v:
+                        result['description'] = v[0]
+                        break
+        if not result['favicon'] and soup:
+            favicon = extract_favicon(soup, url)
+            if favicon:
+                result['favicon'] = favicon
     except Exception as e:
         print(f"Error parsing metadata: {e}")
         pass
 
-    if not result['image'] or not result['title'] or not result['description']:
+    if (not result['image'] or not result['title'] or not result['description']) and soup:
         try:
-            extract_metadata_with_bs4(url, result, soup, headers)
+            extract_metadata_with_bs4(url, result, soup=soup, headers=headers)
         except Exception as e:
             print(f"Error parsing metadata BeautifulSoup: {e}")
             pass
@@ -281,7 +305,7 @@ def background_fetch_metadata(link_id: int):
     finally:
         db.close()
 
-def background_import_linkstore(linkstore_token: str, collection_id: int):
+def background_import_linkstore(linkstore_token: str, collection_id: int, max_links: int = 10000):
     db = SessionLocal()
     try:
         linkstore_url = "https://linkstore.app/api/link"
@@ -289,11 +313,15 @@ def background_import_linkstore(linkstore_token: str, collection_id: int):
         previous_url = None
         count = 0
         
-        while True:
+        while count < max_links:
             try:
-                response = requests.get(linkstore_url, headers=linkstore_headers)
+                response = requests.get(linkstore_url, headers=linkstore_headers, timeout=10)
                 response.raise_for_status()
                 
+                # Bound single link URL length
+                if len(response.text) > 4096:
+                    break
+
                 current_url = response.text.strip().strip('"').strip("'")
                 
                 if not current_url or current_url == previous_url:
