@@ -25,6 +25,7 @@ export default function Pagination({ page, totalPages, setPage }: PaginationProp
     }
     setShowInputFor(null);
     setInputValue('');
+    window.scrollTo(0, 0);
   };
 
   const pages: (number | string)[] = [];
