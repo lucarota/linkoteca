@@ -17,15 +17,19 @@ export default function Pagination({ page, totalPages, setPage }: PaginationProp
     }
   }, [showInputFor]);
 
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo(0, 0);
+  };
+
   const handleGo = () => {
     let p = parseInt(inputValue, 10);
     if (!isNaN(p) && p > 0) {
       if (p > totalPages) p = totalPages;
-      setPage(p);
+      handlePageChange(p);
     }
     setShowInputFor(null);
     setInputValue('');
-    window.scrollTo(0, 0);
   };
 
   const pages: (number | string)[] = [];
@@ -80,7 +84,7 @@ export default function Pagination({ page, totalPages, setPage }: PaginationProp
     <div className="flex items-center text-xs leading-5 font-medium text-gray-700">
       <a 
         className={`${page <= 1 ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:text-blue-600'} relative inline-flex items-center rounded-md px-2 select-none`} 
-        onClick={() => page > 1 && setPage(page - 1)}
+        onClick={() => page > 1 && handlePageChange(page - 1)}
       >
         Previous
       </a>
@@ -120,7 +124,7 @@ export default function Pagination({ page, totalPages, setPage }: PaginationProp
           return (
             <a
               key={pageNum}
-              onClick={() => setPage(pageNum)}
+              onClick={() => handlePageChange(pageNum)}
               className={`px-1.5 min-w-5 text-center rounded select-none cursor-pointer ${
                 page === pageNum 
                   ? 'text-black font-bold' 
@@ -135,7 +139,7 @@ export default function Pagination({ page, totalPages, setPage }: PaginationProp
 
       <a 
         className={`${page >= totalPages ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:text-blue-600'} relative inline-flex items-center rounded-md px-2 select-none`} 
-        onClick={() => page < totalPages && setPage(page + 1)}
+        onClick={() => page < totalPages && handlePageChange(page + 1)}
       >
         Next
       </a>
