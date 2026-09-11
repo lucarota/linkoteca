@@ -1,5 +1,7 @@
 /.idea/
+**/__pycache__
 /deploy/
+/backend/remote-debug-profile/
 
 # Python
 __pycache__/
@@ -7,11 +9,9 @@ __pycache__/
 *$py.class
 venv/
 .venv/
-env/
-*.env
+.env
 backend/.env
-*.db
-backend/*.db
+backend/*.db*
 .pytest_cache/
 
 # Node
