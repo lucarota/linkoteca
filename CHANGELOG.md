@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2026-09-11
+
+### Added
+- **Security:** Implemented SSRF protection on metadata scraping and enforced bounded outbound response streaming.
+- **Database:** Added SQLite pragma settings to optimize performance and enable foreign key support.
+
+### Changed
+- **Project Structure:** Added `package-lock.json` and updated `.gitignore` for better dependency and environment management.
+- **UI & UX Enhancements:** Added a pointer cursor to the "Back to home" button in the Public Directory screen.
+
+### Fixed
+- **Pagination:** Reset the scroll position to the top when changing pages.
+
 ## [1.0.3] - 2026-08-16
 
 ### Added
