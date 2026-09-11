@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {API_URL} from '../config';
 
@@ -8,6 +8,8 @@ function AuthScreen() {
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [stats, setStats] = useState({links: 0, collections: 0})
+    const nameRef = useRef<HTMLInputElement>(null)
+    const passwordRef = useRef<HTMLInputElement>(null)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -102,21 +104,39 @@ function AuthScreen() {
                             <div className="w-full flex flex-col justify-center items-center">
                                 <div className="w-full flex flex-col justify-center items-center pt-5">
                                     <input
+                                        ref={nameRef}
                                         className="w-full appearance-none block text-gray-700 border text-lg border-gray-200 rounded p-3 py-4 leading-3 focus:outline-none"
                                         placeholder="Enter collection name"
                                         type="text"
                                         value={name}
                                         onChange={e => cleanCollectionName(e.target.value)}
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                passwordRef.current?.focus();
+                                            }
+                                        }}
                                         required
                                     />
                                 </div>
                                 <div className="w-full flex flex-col justify-center items-center pt-5">
                                     <input
+                                        ref={passwordRef}
                                         className="w-full appearance-none block text-gray-700 border text-lg border-gray-200 rounded p-3 py-4 leading-3 focus:outline-none"
                                         placeholder="Enter password"
                                         type="password"
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                if (name.trim() === '') {
+                                                    nameRef.current?.focus();
+                                                } else {
+                                                    handleAction(e, 'login');
+                                                }
+                                            }
+                                        }}
                                         required
                                     />
                                 </div>
