@@ -28,6 +28,10 @@ function AuthScreen() {
     const handleAction = async (e: any, action: 'login' | 'register') => {
         e.preventDefault()
         setError('')
+        if (!name || !password) {
+            setError('Name and password are required')
+            return
+        }
         try {
             const res = await fetch(`${API_URL}/${action}`, {
                 method: 'POST',

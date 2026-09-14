@@ -19,6 +19,11 @@ def register(col: CollectionCreate, db: Session = Depends(get_db)):
     col.name = col.name.lower()
     col.name = re.sub(r'[^a-z0-9_-]+', '_', col.name)
 
+    if not col.name:
+        raise HTTPException(status_code=400, detail="Name cannot be empty")
+    if not col.password:
+        raise HTTPException(status_code=400, detail="Password cannot be empty")
+
     if col.name in ["directory", "api", "settings", "admin", "static"]:
         raise HTTPException(status_code=400, detail="This collection name is reserved")
         
@@ -39,6 +44,10 @@ def register(col: CollectionCreate, db: Session = Depends(get_db)):
 def login(col: CollectionCreate, db: Session = Depends(get_db)):
     """Authenticates a collection login and returns a JWT token."""
     col.name = col.name.lower()
+    if not col.name:
+        raise HTTPException(status_code=400, detail="Name cannot be empty")
+    if not col.password:
+        raise HTTPException(status_code=400, detail="Password cannot be empty")
     db_col = db.scalar(select(Collection).filter(Collection.name == col.name))
     if not db_col or not verify_password(col.password, db_col.password_hash):
         raise HTTPException(status_code=400, detail="Incorrect name or password")
