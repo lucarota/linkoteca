@@ -49,3 +49,17 @@ The API will be available at `http://localhost:8000`. You can also access the in
 ## Database
 
 The application uses a local SQLite database named `linkoteca.db`. It is automatically generated and managed by SQLAlchemy when the application starts for the first time.
+
+## Testing
+
+To run the test suite, you need to install `pytest` and `httpx` (required for testing FastAPI applications), and then run the `pytest` command.
+
+1. **Install testing dependencies**:
+   ```bash
+   pip install pytest httpx
+   ```
+
+2. **Run the tests**:
+   ```bash
+   pytest
+   ```
