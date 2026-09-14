@@ -146,14 +146,14 @@ function AuthScreen() {
                                 <div className="w-full md:flex justify-between items-center py-7">
                                     <button
                                         onClick={e => handleAction(e, 'login')}
-                                        className="capitalize bg-black flex-1 w-full hover:bg-blue-600 text-white font-bold py-3 px-12 border text-lg hover:border-transparent rounded">
+                                        className="capitalize bg-black flex-1 w-full hover:bg-blue-600 text-white font-bold py-3 px-12 border text-lg hover:border-transparent rounded cursor-pointer">
                                         Login
                                     </button>
                                     <div className="md:flex items-center">
                                         <div className="py-2 px-4">or</div>
                                         <button
                                             onClick={e => handleAction(e, 'register')}
-                                            className="w-full border rounded text-gray-700 text-sm hover:border-transparent hover:bg-blue-600 hover:text-white py-2 px-3">
+                                            className="w-full border rounded text-gray-700 text-sm hover:border-transparent hover:bg-blue-600 hover:text-white py-2 px-3 cursor-pointer">
                                             Create new collection
                                         </button>
                                     </div>
